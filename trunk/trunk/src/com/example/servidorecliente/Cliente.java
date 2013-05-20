@@ -7,10 +7,12 @@ import java.net.UnknownHostException;
 import com.example.servidorecliente.rede.ControleDeUsuariosCliente;
 import com.example.servidorecliente.rede.DepoisDeReceberDados;
 import com.example.servidorecliente.rede.Killable;
+import com.example.servidorecliente.rede.Protocolo;
 import com.example.servidorecliente.util.DialogHelper;
 import com.example.servidorecliente.util.ViewUtil;
 
 import android.media.AudioManager;
+import android.net.wifi.WifiConfiguration.Protocol;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,7 +26,7 @@ import android.content.Intent;
 public class Cliente extends Activity implements Killable
 
 {
-	public static final String TAG = "rede";
+	public static final String TAG = "cliente";
 	private static final int PORTA_PADRAO = 2121;
 	private GerenteDEConexao gerente;
 
@@ -33,12 +35,13 @@ public class Cliente extends Activity implements Killable
 	private String usuario;
 	private ViewDeRede viewDoJogo;
 	private Conexao conexao;
+	public static boolean conectou;
 
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
 	//	requestWindowFeature(Window.FEATURE_NO_TITLE);
-	 //   setVolumeControlStream(AudioManager.STREAM_MUSIC);
+	    setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		setContentView(R.layout.cliente);
 		Log.i(TAG, "entrei no OnCreate cliente ");
 		
@@ -47,7 +50,9 @@ public class Cliente extends Activity implements Killable
 	}
 	
 	public void conectar(View sender) {
+		
 		Log.i(TAG, "entrei no conectar");
+		conectou = true;
 		String ip = editIP.getText().toString();
 
 		if (ip.trim().length() == 0) {
@@ -61,18 +66,24 @@ public class Cliente extends Activity implements Killable
 			try {
 				DepoisDeReceberDados tratadorDeDadosDoCliente = new ControleDeUsuariosCliente();
 				
-				usuario="oi amoooorr!!!";
+				usuario=" jogador 2";
 				Socket s = new Socket(ip, PORTA_PADRAO);
 				conexao = new Conexao(s, usuario, tratadorDeDadosDoCliente);
 				
 				Log.i(TAG, usuario + "XXXXXXXXXXXX");
 				
-				// garante que view possa recuperar a lista de usuarios atual e
-				// enviar dados pela rede
 				viewDoJogo = new ViewDeRede(this, conexao,
 						(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
 
 				setContentView(viewDoJogo);
+				
+				// garante que view possa recuperar a lista de usuarios atual e
+				// enviar dados pela rede
+				conexao.write(Protocolo.PROTOCOL_CONNECT);
+
+				
+				Log.i(TAG, "Cliquei no conectar do cliente.");
+
 
 			} catch (UnknownHostException e) {
 				DialogHelper.error(this, "Erro ao conectar com o servidor",
@@ -84,9 +95,6 @@ public class Cliente extends Activity implements Killable
 			}
 
 		}
-
-	
-
 
 	public void onBackPressed()
 	{
