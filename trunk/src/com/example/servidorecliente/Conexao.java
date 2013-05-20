@@ -80,6 +80,7 @@ public class Conexao implements Runnable, Killable {
 				// para cada linha nao nula chama o respectivo handler
 				if (linha != null) {
 					Log.i(TAG, "linha recebida: " + linha);
+					
 					if (depoisDeReceberDadosHandler != null) {
 						depoisDeReceberDadosHandler.execute(this, linha);
 					}

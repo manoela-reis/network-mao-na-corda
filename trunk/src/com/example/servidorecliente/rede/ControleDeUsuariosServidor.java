@@ -13,7 +13,10 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 
 	// notar que este tipo de hashmap eh sincronizado
 	// suportando acessos de multiplos threads
+	public static final String TAG = "controle";
 	private ConcurrentHashMap<String, Jogador> jogadores;
+//	private boolean conectou;
+	public static int count = 0;
 
 	public ControleDeUsuariosServidor() {
 		jogadores = new ConcurrentHashMap<String, Jogador>();
@@ -28,13 +31,20 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 		Log.i(Const.TAG, "<<" + linha);
 
 		if (linha.startsWith(Protocolo.PROTOCOL_ID)) {
+			Log.i(TAG, "Entreou no Protocolo ID");
+			conectou(origem);
 			adicionaNovoUsuario(origem, linha);
 		}
 
 		if (linha.startsWith(Protocolo.PROTOCOL_MOVE)) {
 			moveUsuario(origem, linha);
 		}
-
+		
+		if (linha.startsWith(Protocolo.PROTOCOL_CONNECT)) {
+			Log.i(TAG, "Entreou no Protocolo conectar");
+			conectou(origem);
+		}
+		
 		informaTodosUsuarios(origem);
 	}
 
@@ -47,8 +57,13 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 			Jogador jogador = jogadores.get(key);
 			buffer.append(jogador.toStringCSV());
 		}
-
 		origem.write(buffer.toString());
+	}
+	
+	public void conectou(Conexao origem) 
+	{
+		count ++;
+		Log.i(TAG, "Count aumentado");
 	}
 
 	private void moveUsuario(Conexao origem, String linha) {

@@ -14,7 +14,7 @@
         android:text="Criar Servidor" />
 
     <TextView
-        android:id="@+id/yourID"
+        android:id="@+id/yourIP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Seu ID é: "
