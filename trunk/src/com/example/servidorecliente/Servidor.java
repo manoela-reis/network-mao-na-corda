@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import com.MaoNaCorda.Game;
 import com.example.servidorecliente.rede.ControleDeUsuariosCliente;
 import com.example.servidorecliente.rede.ControleDeUsuariosServidor;
 import com.example.servidorecliente.rede.DepoisDeReceberDados;
@@ -24,7 +25,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 
-public class Servidor extends Activity implements Killable, Runnable
+public class Servidor extends Activity implements Killable
 
 {
 	public static final String TAG = "servidor";
@@ -36,6 +37,8 @@ public class Servidor extends Activity implements Killable, Runnable
 	public EditText your_IP;
 	public EditText aguardando;
 	static ControleDeUsuariosServidor a = new ControleDeUsuariosServidor();
+	Game game;
+	Activity b;
 
 	DepoisDeReceberDados tratadorDeDadosDoCliente = new ControleDeUsuariosCliente();
 
@@ -91,8 +94,14 @@ public class Servidor extends Activity implements Killable, Runnable
 
 			// garante que view possa recuperar a lista de usuarios atual e
 			// enviar dados pela rede
+		//    b = (Activity) context;
+		 //   game = new Game();
 		
-			
+		    viewDoJogo = new ViewDeRede(this, conexao,
+					(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
+
+			//conexao.write(Protocolo.PROTOCOL_CONNECT);				
+			setContentView(viewDoJogo);
 		
 				
 				Toast.makeText(Servidor.this,
@@ -119,7 +128,7 @@ public class Servidor extends Activity implements Killable, Runnable
 		finish();
 	}
 
-	public void run() 
+/*	public void run() 
 	{
 		 while (true)
 		 {
@@ -153,6 +162,6 @@ public class Servidor extends Activity implements Killable, Runnable
 		}
 
 		 
-		 }
+		 }*/
 	
 }
