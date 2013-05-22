@@ -117,15 +117,19 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 	}
 	
-	public void processEventQueue() {
+	public void processEventQueue() 
+	{
+		
+		Log.i(TAG, "Entrou no processEventQueue.");
 
 		MotionEvent event = (MotionEvent) fila.poll();
 		if (event != null) {
+			Log.i(TAG, "Entrou dentro do evento.");
 
 			int action = MotionEventCompat.getActionMasked(event);
 
 			if (action == MotionEvent.ACTION_DOWN) {
-				Log.i("foi", "down baby down !! ");
+				Log.i("foi", "Entrou no down !! ");
 				int id = event.getPointerId(event.getActionIndex());
 
 				PointF point = new PointF(event.getX(id), event.getY(id));
@@ -151,7 +155,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 			}
 			if (action == MotionEvent.ACTION_POINTER_DOWN) {
-				Log.i("foi", "dsegundo !! ");
+				Log.i("foi", "Entrou no Point down!! ");
 				int id = event.getPointerId(event.getActionIndex());
 
 				PointF point = new PointF(event.getX(id), event.getY(id));
@@ -213,6 +217,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 			}
 
 			if (action == MotionEvent.ACTION_MOVE) {
+				Log.i(TAG, "Entrou dentro do move.");
 				for (int i = 0; i < event.getPointerCount(); i++) {
 					int id = event.getPointerId(i);
 
@@ -298,6 +303,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
+		Log.i(TAG, "Entrou no draw.");
 
 	/*	ConcurrentHashMap<String, Jogador> jogadores = tratadorDeDadosDoCliente
 				.getJogadores();
@@ -324,8 +330,9 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 	}
 
-	public void run() {
-
+	public void run() 
+	{
+		Log.i(TAG, "Entrou no run.");
 		while (ativo) {
 			try {
 				Thread.sleep(time);
@@ -348,7 +355,9 @@ public class ViewDeRede extends View implements Runnable, Killable {
 			period -= 1;
 			counter = 0;
 		}
+		Log.i(TAG, "enTROU NO UPDATE");
 		processEventQueue();
+	
 
 	}
 

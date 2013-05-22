@@ -56,7 +56,6 @@ public class Servidor extends Activity implements Killable
 		
 		setContentView(R.layout.servidor);
 		
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		 a = new ControleDeUsuariosServidor();
 	}
 	
@@ -159,9 +158,7 @@ public class Servidor extends Activity implements Killable
 			//conexao.write(Protocolo.PROTOCOL_CONNECT);				
 			setContentView(viewDoJogo);
 			
-		}
-
-		 
-		 }*/
+		}	 
+	}*/
 	
 }
