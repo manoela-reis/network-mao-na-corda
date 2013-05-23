@@ -26,19 +26,20 @@ import com.example.servidorecliente.rede.Killable;
 import com.example.servidorecliente.rede.Protocolo;
 
 public class ViewDeRede extends View implements Runnable, Killable {
-	
-	//acho q é aqui q o jogo "acontece" -> acho q aqui q entrará o código das meninas.
-	
- 	private static final String TAG = "view-rede";
+
+	// acho q é aqui q o jogo "acontece" -> acho q aqui q entrará o código das
+	// meninas.
+
+	private static final String TAG = "view-rede";
 	private static final int UPDATE_TIME = 100;
-//	private Paint paint;
+	// private Paint paint;
 	private long time = 1;
 
 	private ControleDeUsuariosCliente tratadorDeDadosDoCliente;
 	private DadosDoCliente dadosDoCliente;
 	private boolean ativo = true;
-	
-	//meninas
+
+	// meninas
 	int q;
 	int r;
 	int p;
@@ -49,7 +50,11 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	static Rect atual = new Rect();
 	static Rect corda = new Rect();
 	static Rect Impulso = new Rect();
-
+	static Rect Massa = new Rect();
+	static Rect Velocidade = new Rect();
+	static Rect BarrinhaImpulso = new Rect();
+	static Rect BarrinhaVelocidade = new Rect();
+	static Rect BarrinhaMassa = new Rect();
 	private int counter;
 	private int period = 100;
 	private int current;
@@ -59,8 +64,10 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	private static float Width = 30;
 	private static float Height = 30;
 	ImageManager img;
-	Bitmap imagem;
+	Bitmap background;
 	Bitmap impulso;
+	Bitmap velocidade;
+	Bitmap massa;
 	int Forca;
 	int Num_impulso;
 	Boolean impp = false;
@@ -70,7 +77,6 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	String PriTouch;
 	private Queue<MotionEvent> fila;
 	private SparseArray<PointF> dedos = new SparseArray<PointF>();
-
 
 	public ViewDeRede(Context context, Conexao cliente,
 			ControleDeUsuariosCliente tratadorDeDadosDoCliente) {
@@ -87,28 +93,37 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 		// primeira mensagem
 		cliente.write(Protocolo.PROTOCOL_ID + "," + cliente.getId() + ",0,0");
-		
-		//meninas
+
+		// meninas
 		setFocusableInTouchMode(true);
 		setClickable(true);
 		setLongClickable(true);
+
 		fila = new LinkedList<MotionEvent>();
+
 		paint.setColor(Color.BLACK);
-		paint.setTextSize(20);
+
 		img = new ImageManager((int) positionY * 2, (int) positionY * 2);
-		imagem = img.ImageManager("Game_Guerra.jpg", context);
+		background = img.ImageManager("Game_Guerra.jpg", context);
 		impulso = img.ImageManager("amarelo.png", context);
+		velocidade = img.ImageManager("amarelo.png", context);
+		massa = img.ImageManager("amarelo.png", context);
 
 		Thread processo = new Thread(this);
 		processo.start();
 
 	}
-	
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) 
-	{
+
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		Impulso.set((int) getWidth() / 10, (int) 6 * getHeight() / 10, (int) 3
-				* getWidth() / 10, (int) 8 * getHeight() / 10);
+
+		int larguraItem = (int) getWidth() / 10;
+		int alturaItem = (int) getHeight() / 10;
+		CreateItens(larguraItem, alturaItem);
+
+		int larguraBarra = (int) getWidth() / 15;
+		int alturaBarra = (int) getHeight() / 15;
+		CreateBarrinhas(larguraBarra, alturaBarra);
 
 		Width = getWidth() / 2;
 		Height = getHeight() / 2;
@@ -116,20 +131,39 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		positionY = Height;
 
 	}
-	
-	public void processEventQueue() 
-	{
-		
-		Log.i(TAG, "Entrou no processEventQueue.");
 
+	public void CreateBarrinhas(int larguraBarra, int alturaBarra) {
+		BarrinhaImpulso.set(larguraBarra, 2 * alturaBarra,
+				(int) (1.5f * larguraBarra), (int) (2.5f * alturaBarra));
+		BarrinhaVelocidade.set(larguraBarra, 3 * alturaBarra,
+				(int) (1.5f * larguraBarra), (int) (3.5f * alturaBarra));
+		BarrinhaMassa.set(larguraBarra, (4 * alturaBarra),
+				(int) (1.5f * larguraBarra), (int) (4.5f * alturaBarra));
+	}
+
+	public void CreateItens(int larguraItem, int alturaItem) {
+		Impulso.set(larguraItem, 6 * alturaItem, (int) (2.1f * larguraItem),
+				(int) (7.5f * alturaItem));
+		Velocidade.set((int) (2.3f * larguraItem), 6 * alturaItem,
+				(int) (3.3f * larguraItem), (int) (7.5f * alturaItem));
+		Massa.set((int) (3.5f * larguraItem), 6 * alturaItem,
+				(int) (4.5f * larguraItem), (int) (7.5f * alturaItem));
+
+	}
+
+	public boolean onTouchEvent(MotionEvent event) {
+		fila.add(event);
+		return super.onTouchEvent(event);
+	}
+
+	public void processEventQueue() {
 		MotionEvent event = (MotionEvent) fila.poll();
 		if (event != null) {
-			Log.i(TAG, "Entrou dentro do evento.");
 
 			int action = MotionEventCompat.getActionMasked(event);
 
 			if (action == MotionEvent.ACTION_DOWN) {
-				Log.i("foi", "Entrou no down !! ");
+				Log.i("foi", "down baby down !! ");
 				int id = event.getPointerId(event.getActionIndex());
 
 				PointF point = new PointF(event.getX(id), event.getY(id));
@@ -137,25 +171,45 @@ public class ViewDeRede extends View implements Runnable, Killable {
 				q = (int) event.getX(id);
 				r = (int) event.getY(id);
 				Log.d("vamos", "" + q);
-				
-				if (Impulso.contains(q, r)) {
-					impp = true;
-					Num_impulso++;
-					current = period;
-					PriTouch = "Impulso";
-				}
-				
-				if (corda.contains(q, r)) {
-					possivel = true;
-					impp = false;
-					PriTouch = "corda";
+				if (!impp) {
+					if (Impulso.contains(q, r)) {
+						impp = true;
+						Num_impulso = 1;
+						current = period;
+						PriTouch = "Impulso";
+
+					}
+					if (Velocidade.contains(q, r)) {
+						impp = true;
+						Num_impulso = 1;
+						current = period;
+						PriTouch = "Velocidade";
+
+					}
+					if (Massa.contains(q, r)) {
+						impp = true;
+						Num_impulso = 1;
+						current = period;
+						PriTouch = "Massa";
+
+					}
 
 				}
+
+				if (!possivel) {
+					if (corda.contains(q, r)) {
+						possivel = true;
+						impp = false;
+						PriTouch = "corda";
+
+					}
+				}
+
 				dedos.put(id, point);
 
 			}
 			if (action == MotionEvent.ACTION_POINTER_DOWN) {
-				Log.i("foi", "Entrou no Point down!! ");
+				Log.i("foi", "dsegundo !! ");
 				int id = event.getPointerId(event.getActionIndex());
 
 				PointF point = new PointF(event.getX(id), event.getY(id));
@@ -167,10 +221,25 @@ public class ViewDeRede extends View implements Runnable, Killable {
 				if (impp == false) {
 					if (Impulso.contains(segTouchX, segTouchY)) {
 						impp = true;
-						Num_impulso++;
+						Num_impulso = 1;
 						current = period;
 						SegTouch = "Impulso";
 					}
+					if (Velocidade.contains(segTouchX, segTouchY)) {
+						impp = true;
+						Num_impulso = 1;
+						current = period;
+						SegTouch = "Velocidade";
+
+					}
+					if (Massa.contains(segTouchX, segTouchY)) {
+						impp = true;
+						Num_impulso = 1;
+						current = period;
+						SegTouch = "Massa";
+
+					}
+
 				}
 				if (possivel == false) {
 					if (corda.contains(segTouchX, segTouchY)) {
@@ -189,18 +258,17 @@ public class ViewDeRede extends View implements Runnable, Killable {
 				p = (int) event.getX(id);
 				t = (int) event.getY(id);
 				if (possivel) {
-					if (corda.contains(p, t)) {
+					if (corda.contains(p, corda.centerY())) {
 
 						if (PriTouch == "corda") {
 
-							aplicarForca((int) (p - q) / 3 * Num_impulso);
+							aplicarForca((int) (p - q) / 3);
 							possivel = false;
 
 						} else {
 							if (SegTouch == "corda") {
 
-								aplicarForca((int) (p - segTouchX) / 3
-										* Num_impulso);
+								aplicarForca((int) (p - segTouchX) / 3);
 								possivel = false;
 
 							}
@@ -212,12 +280,19 @@ public class ViewDeRede extends View implements Runnable, Killable {
 						Num_impulso = (current - period) * 10;
 						impp = false;
 					}
+					if (Velocidade.contains(p, t)) {
+						Num_impulso = (current - period);
+						impp = false;
+					}
+					if (Massa.contains(p, t)) {
+						Num_impulso = (current - period);
+						impp = false;
+					}
 				}
 				dedos.remove(id);
 			}
 
 			if (action == MotionEvent.ACTION_MOVE) {
-				Log.i(TAG, "Entrou dentro do move.");
 				for (int i = 0; i < event.getPointerCount(); i++) {
 					int id = event.getPointerId(i);
 
@@ -226,8 +301,10 @@ public class ViewDeRede extends View implements Runnable, Killable {
 						if ((int) point.x == q) {
 							if (possivel == true && q < event.getX(id)
 									&& PriTouch == "corda") {
-								if (corda.contains((int) event.getX(id),
-										(int) event.getY(id))) {
+								if (corda.contains((int) (event.getX(id)),
+										corda.centerY())) {
+									// if (corda.contains((int) event.getX(id),
+									// (int) event.getY(id))) {
 									positionX = event.getX(id);
 								} else {
 									aplicarForca((int) ((event.getX(id) - q) / 3 * Num_impulso));
@@ -235,8 +312,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 									dedos.remove(id);
 								}
 							}
-						}
 
+						}
 						if ((int) point.x == segTouchX) {
 							if (possivel == true && segTouchX < event.getX(id)
 									&& SegTouch == "corda") {
@@ -261,18 +338,17 @@ public class ViewDeRede extends View implements Runnable, Killable {
 				a = (int) event.getX(id);
 				b = (int) event.getY(id);
 				if (possivel) {
-					if (corda.contains(a, b)) {
+					if (corda.contains(a, corda.centerY())) {
 
 						if (PriTouch == "corda") {
 
-							aplicarForca((int) (a - q) / 3 * Num_impulso);
+							aplicarForca((int) (a - q) / 3);
 							possivel = false;
 
 						}
 						if (SegTouch == "corda") {
 
-							aplicarForca((int) (a - segTouchX) / 3
-									* Num_impulso);
+							aplicarForca((int) (a - segTouchX) / 3);
 							possivel = false;
 
 						}
@@ -284,6 +360,14 @@ public class ViewDeRede extends View implements Runnable, Killable {
 						Num_impulso = (current - period) * 10;
 						impp = false;
 					}
+					if (Velocidade.contains(a, b)) {
+						Num_impulso = (current - period);
+						impp = false;
+					}
+					if (Massa.contains(a, b)) {
+						Num_impulso = (current - period);
+						impp = false;
+					}
 				}
 				dedos.remove(id);
 			}
@@ -293,45 +377,78 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 	private void aplicarForca(int i) {
 
-		// positionX+=i;
+		if (BarrinhaImpulso.right - BarrinhaImpulso.left >= 3) {
+			Forca = (int) (Forca * 1.3f);
+			BarrinhaImpulso.right += -3;
+		} else {
+
+			Forca = (int) (Forca * 1.1f);
+			BarrinhaImpulso.right = BarrinhaImpulso.left;
+		}
 
 		Forca = i;
 		// TODO Auto-generated method stub
 		positionX = Width;
 	}
 
-
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
 		Log.i(TAG, "Entrou no draw.");
 
-	/*	ConcurrentHashMap<String, Jogador> jogadores = tratadorDeDadosDoCliente
-				.getJogadores();
-
-		Iterator<String> iterator = jogadores.keySet().iterator();
-		while (iterator.hasNext()) {
-			String key = iterator.next();
-			Jogador jogador = jogadores.get(key);
-
-			canvas.drawCircle(jogador.getX(), jogador.getY(), raio, paint);
-			canvas.drawText("<" + jogador.getID() + ">", jogador.getX()
-					- raio, jogador.getY() + raio + margem + fontSize, paint);
-		
-		}*/
+		/*
+		 * ConcurrentHashMap<String, Jogador> jogadores =
+		 * tratadorDeDadosDoCliente .getJogadores();
+		 * 
+		 * Iterator<String> iterator = jogadores.keySet().iterator(); while
+		 * (iterator.hasNext()) { String key = iterator.next(); Jogador jogador
+		 * = jogadores.get(key);
+		 * 
+		 * canvas.drawCircle(jogador.getX(), jogador.getY(), raio, paint);
+		 * canvas.drawText("<" + jogador.getID() + ">", jogador.getX() - raio,
+		 * jogador.getY() + raio + margem + fontSize, paint);
+		 * 
+		 * }
+		 */
 		atual.set(0, 0, (int) Width * 2, (int) Height * 2);
 		corda.set((int) positionX, (int) positionY, (int) positionX + 200,
 				(int) positionY + 100);
-		canvas.drawBitmap(imagem, null, atual, paint);
-		canvas.drawRect(corda, paint);
-		canvas.drawText("forcaa" + Forca + "impulsooo" + Num_impulso, 50, 30,
-				paint);
-		canvas.drawRect(Impulso, paint);
 
+		canvas.drawBitmap(background, null, atual, paint);
+		canvas.drawRect(corda, paint);
+
+		drawBarrinhas(canvas);
+		drawRectItem(canvas);
+		drawTextItens(canvas);
 
 	}
 
-	public void run() 
-	{
+	public void drawBarrinhas(Canvas canvas) {
+		canvas.drawRect(BarrinhaImpulso, paint);
+		canvas.drawRect(BarrinhaVelocidade, paint);
+		canvas.drawRect(BarrinhaMassa, paint);
+	}
+
+	public void drawTextItens(Canvas canvas) {
+		paint.setTextSize(10);
+		canvas.drawText("Impulso", BarrinhaImpulso.left + 55,
+				BarrinhaImpulso.bottom, paint);
+		canvas.drawText("Velocidade", BarrinhaVelocidade.left + 55,
+				BarrinhaVelocidade.bottom, paint);
+		canvas.drawText("Massa", BarrinhaMassa.left + 55, BarrinhaMassa.bottom,
+				paint);
+		// paint.setTextSize(20);
+		// canvas.drawText("forcaa" + Forca + "impulsooo" + Num_impulso, 50, 30,
+		// paint);
+	}
+
+	public void drawRectItem(Canvas canvas) {
+		canvas.drawRect(Massa, paint);
+		canvas.drawRect(Impulso, paint);
+		canvas.drawRect(Velocidade, paint);
+
+	}
+
+	public void run() {
 		Log.i(TAG, "Entrou no run.");
 		while (ativo) {
 			try {
@@ -347,7 +464,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 	private void update() {
 		if (period != 0) {
-			
+
 			counter++;
 		}
 
@@ -356,21 +473,59 @@ public class ViewDeRede extends View implements Runnable, Killable {
 			counter = 0;
 		}
 		Log.i(TAG, "enTROU NO UPDATE");
+
+		if (counter == 300 || counter == 600 || counter == 900) {
+			if (impp) {
+
+				if (SegTouch == "Impulso" || PriTouch == "Impulso") {
+					if (BarrinhaImpulso.right - BarrinhaImpulso.left < 50) {
+						if (BarrinhaImpulso.right + 3 - BarrinhaImpulso.left > 50) {
+							BarrinhaImpulso.right = 50 + BarrinhaImpulso.left;
+
+						} else {
+							BarrinhaImpulso.right += 1;
+						}
+
+					}
+				}
+				if (SegTouch == "Velocidade" || PriTouch == "Velocidade") {
+					if (BarrinhaVelocidade.right - BarrinhaVelocidade.left < 50) {
+						if (BarrinhaVelocidade.right + 3
+								- BarrinhaVelocidade.left > 50) {
+							BarrinhaVelocidade.right = 50 + BarrinhaVelocidade.left;
+
+						} else {
+							BarrinhaVelocidade.right += 1;
+						}
+					}
+				}
+				if (SegTouch == "Massa" || PriTouch == "Massa") {
+					if (BarrinhaMassa.right - BarrinhaMassa.left < 50) {
+						if (BarrinhaMassa.right + 3 - BarrinhaMassa.left > 50) {
+							BarrinhaMassa.right = 50 + BarrinhaMassa.left;
+
+						} else {
+							BarrinhaMassa.right += 1;
+						}
+					}
+				}
+			}
+		}
+
 		processEventQueue();
-	
 
 	}
 
-/*	public boolean onTouchEvent(MotionEvent event) {
-		int action = event.getAction();
-		Log.i(TAG, "ontouch: " + action);
-
-		int id = event.getPointerId(event.getActionIndex());
-		dadosDoCliente.setX((int) event.getX(id));
-		dadosDoCliente.setY((int) event.getY(id));
-
-		return super.onTouchEvent(event);
-	}*/
+	/*
+	 * public boolean onTouchEvent(MotionEvent event) { int action =
+	 * event.getAction(); Log.i(TAG, "ontouch: " + action);
+	 * 
+	 * int id = event.getPointerId(event.getActionIndex());
+	 * dadosDoCliente.setX((int) event.getX(id)); dadosDoCliente.setY((int)
+	 * event.getY(id));
+	 * 
+	 * return super.onTouchEvent(event); }
+	 */
 
 	public void killMeSoftly() {
 		ativo = false;
