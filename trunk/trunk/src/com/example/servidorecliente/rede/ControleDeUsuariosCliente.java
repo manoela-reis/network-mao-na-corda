@@ -1,5 +1,6 @@
 package com.example.servidorecliente.rede;
 
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.example.servidorecliente.Conexao;
@@ -8,6 +9,7 @@ import com.example.servidorecliente.bean.Jogador;
 public class ControleDeUsuariosCliente implements DepoisDeReceberDados {
 
 	private ConcurrentHashMap<String, Jogador> jogadores;
+	public Jogador jogador;
 
 	public ConcurrentHashMap<String, Jogador> getJogadores() {
 		return jogadores;
@@ -16,6 +18,20 @@ public class ControleDeUsuariosCliente implements DepoisDeReceberDados {
 	public ControleDeUsuariosCliente() {
 		jogadores = new ConcurrentHashMap<String, Jogador>();
 	}
+	public Jogador jog (String id){
+		Iterator iterator = jogadores.keySet().iterator();
+		while (iterator.hasNext()) {
+			Jogador jogador = jogadores.get(id);
+			
+		
+			
+			//jogador.setY(y);
+		}
+		return jogador;
+	
+	}
+	
+	
 
 	// recebe do servidor no formato : nome,x,y;nome,x,y
 	public void execute(Conexao origem, String linha) {
@@ -29,13 +45,14 @@ public class ControleDeUsuariosCliente implements DepoisDeReceberDados {
 			
 			int x = Integer.parseInt(separado[1]);
 			int y = Integer.parseInt(separado[2]);
-
-			Jogador jogador = jogadores.get(id);
+			
+			jogador = jogadores.get(id);
 			
 			if (jogador == null) {
 				
 				jogador = new Jogador(id, x, y);
 				jogadores.put(id , jogador);
+				
 				
 			} else {
 				jogador.setX(x);

@@ -24,7 +24,7 @@ import com.example.servidorecliente.util.ViewUtil;
 
 public class MainActivity extends Activity 
 {
-	public static final String TAG = "rede";
+	public static final String TAG = "MainActivity";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{

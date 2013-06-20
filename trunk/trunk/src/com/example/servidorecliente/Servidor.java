@@ -25,10 +25,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 
-public class Servidor extends Activity implements Killable
+public class Servidor extends Activity implements Killable, Runnable
 
 {
-	public static final String TAG = "servidor";
+	public static final String TAG = "servidor-cliente";
+	public static final String RUN = "run";
 	private static final int PORTA_PADRAO = 2121;
 	private GerenteDEConexao gerente;
 	private String usuario;
@@ -39,17 +40,18 @@ public class Servidor extends Activity implements Killable
 	static ControleDeUsuariosServidor a = new ControleDeUsuariosServidor();
 	Game game;
 	Activity b;
+	Thread thread;
 
-	DepoisDeReceberDados tratadorDeDadosDoCliente = new ControleDeUsuariosCliente();
-
+	DepoisDeReceberDados tratadorDeDadosDoCliente ;
 
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
+		
 		//requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	
-		Log.i(TAG, "entrei no OnCreate servidor ");
+		Log.i(TAG, "entrei no OnCreate servidor-cliente ");
 		
 		your_IP = (EditText) findViewById(R.id.yourIP);
 		aguardando = (EditText) findViewById(R.id.aguardando);
@@ -57,12 +59,18 @@ public class Servidor extends Activity implements Killable
 		setContentView(R.layout.servidor);
 		
 		 a = new ControleDeUsuariosServidor();
+		
+		 thread = new Thread(this);
+		 thread.start();
+		 
+		 ElMatador.getInstance().add(this);
 	}
 	
 	public void criarServidor(View sender) {
 
 		try 
 		{
+			
 			String serverIp = RedeUtil.getLocalIpAddress();
 			
 			Log.i(TAG, "criei servidor incialmente.");
@@ -81,8 +89,16 @@ public class Servidor extends Activity implements Killable
 
 			Socket s = new Socket("127.0.0.1", PORTA_PADRAO);
 			conexao = new Conexao(s, usuario, tratadorDeDadosDoCliente);
+			//conexao.write(Protocolo.PROTOCOL_ID);
 			
-//			Log.i(TAG, "teste.");
+			
+			viewDoJogo = new ViewDeRede(this, conexao,
+					(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
+			
+			//conexao.write(Protocolo.PROTOCOL_CONNECT);				
+			setContentView(viewDoJogo);
+			
+			Log.i(TAG, "Rede criada.");
 			
 			//your_IP.setVisibility(View.VISIBLE);
 			//aguardando.setVisibility(View.VISIBLE);
@@ -96,11 +112,9 @@ public class Servidor extends Activity implements Killable
 		//    b = (Activity) context;
 		 //   game = new Game();
 		
-		    viewDoJogo = new ViewDeRede(this, conexao,
-					(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
 
 			//conexao.write(Protocolo.PROTOCOL_CONNECT);				
-			setContentView(viewDoJogo);
+			//setContentView(viewDoJogo);
 		
 				
 				Toast.makeText(Servidor.this,
@@ -119,6 +133,9 @@ public class Servidor extends Activity implements Killable
 			DialogHelper.error(this, "Erro ao comunicar com o servidor",
 					MainActivity.TAG, e);
 		}
+		
+		Log.i(TAG, "Esperando conexao ");
+		System.out.print("run");
 
 	}
 	
@@ -127,38 +144,41 @@ public class Servidor extends Activity implements Killable
 		finish();
 	}
 
-/*	public void run() 
-	{
-		 while (true)
-		 {
-			   try 
-			   {
-				   Log.i(TAG, "entrei no run ");
-				   Thread.sleep(60);
-			   }
-			   catch (InterruptedException e) 
-			   {
-				   Log.e(MainActivity.TAG, "interrupcao do run()");
-			   }
-			   	update();
-		 }
+		 
+		 public void run() {
+			 Log.i(TAG, "entrei no run ");
+			 System.out.print("run");
+				
+				while (true) {
+					try {
+						Thread.sleep(60);
+					} catch (InterruptedException e) {
+						Log.e(MainActivity.TAG, "interrupcao do run()");
+					}
+					//update();
+					//postInvalidate();
+				}
+
+			}
 
 		
-	}	
+	
 	
 	public void update() 
 	{
-		Log.i(TAG, "entrei no Update ");
+		Log.i(RUN, "entrei no Update do Servidor Cliente ");
 
-		if (ControleDeUsuariosServidor.count == 1)
-		{	
+		if (a.count == 2)
+		{				
+			Log.i(TAG, "Entrei na condição.");
+
 			viewDoJogo = new ViewDeRede(this, conexao,
 					(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
-
+			
 			//conexao.write(Protocolo.PROTOCOL_CONNECT);				
 			setContentView(viewDoJogo);
-			
+			ControleDeUsuariosServidor.count = -1;
 		}	 
-	}*/
+	}
 	
 }

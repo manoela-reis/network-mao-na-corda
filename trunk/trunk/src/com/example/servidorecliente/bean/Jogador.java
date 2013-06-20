@@ -1,5 +1,7 @@
 package com.example.servidorecliente.bean;
 
+import com.example.servidorecliente.ViewDeRede;
+
 public class Jogador {
 	private String identificador;
 	// este é o identifador se vc é jogar UM ou jogador DOIS;
@@ -15,7 +17,7 @@ public class Jogador {
 	}
 
 	public String toString() {
-		return "Jogador [ID=" + identificador + ", x=" + x + ", y=" + y + "]";
+		return "Jogador [ID=" + identificador + ", x=" + x + ", y=" + y +"]";
 	}
 
 	public String getID() {
@@ -32,18 +34,21 @@ public class Jogador {
 
 	public void setX(int x) {
 		this.x = x;
+		
 	}
 
 	public int getY() {
 		return y;
 	}
 
+	
 	public void setY(int y) {
 		this.y = y;
 	}
 
+
 	public String toStringCSV() {
-		return identificador + "," + x + "," + y + ";";
+		return identificador + "," + x + "," + y +";";
 	}
 
 }
