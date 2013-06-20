@@ -56,7 +56,7 @@ import com.example.servidorecliente.rede.Killable;public class ElMatador {
 			Killable target = targets.pop();
 			kill(target, targetAsString(target));
 			
-			Log.i(MainActivity.TAG, "matouuu"); //funciona!!
+			Log.i(MainActivity.TAG, "matouuu"); 
 		}
 
 		Log.i(TAG, "END kill the all");

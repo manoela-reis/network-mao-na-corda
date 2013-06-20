@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import com.example.servidorecliente.bean.Jogador;
 import com.example.servidorecliente.rede.ControleDeUsuariosCliente;
 import com.example.servidorecliente.rede.DepoisDeReceberDados;
 import com.example.servidorecliente.rede.Killable;
@@ -23,7 +24,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 
-public class Cliente extends Activity implements Killable
+public class Cliente extends Activity implements Killable, Runnable
 
 {
 	public static final String TAG = "cliente";
@@ -36,7 +37,8 @@ public class Cliente extends Activity implements Killable
 	private ViewDeRede viewDoJogo;
 	private Conexao conexao;
 	public static boolean conectou;
-
+public ControleDeUsuariosCliente tratadorDeDadosDoCliente;
+public int count;
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
@@ -45,7 +47,6 @@ public class Cliente extends Activity implements Killable
 		setContentView(R.layout.cliente);
 		Log.i(TAG, "entrei no OnCreate cliente ");
 		
-
 		editIP = (EditText) findViewById(R.id.editText1);
 	}
 	
@@ -64,23 +65,21 @@ public class Cliente extends Activity implements Killable
 		}
 
 			try {
-				DepoisDeReceberDados tratadorDeDadosDoCliente = new ControleDeUsuariosCliente();
+				tratadorDeDadosDoCliente = new ControleDeUsuariosCliente();
 				
 				usuario=" jogador 2";
 				Socket s = new Socket(ip, PORTA_PADRAO);
 				conexao = new Conexao(s, usuario, tratadorDeDadosDoCliente);
-				
 				Log.i(TAG, usuario + "XXXXXXXXXXXX");
+				conexao.write(Protocolo.PROTOCOL_CONNECT);
 				
 				viewDoJogo = new ViewDeRede(this, conexao,
-						(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
+					(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
 
 				setContentView(viewDoJogo);
-				
 				// garante que view possa recuperar a lista de usuarios atual e
 				// enviar dados pela rede
-				conexao.write(Protocolo.PROTOCOL_CONNECT);
-
+				
 				
 				Log.i(TAG, "Cliquei no conectar do cliente.");
 
@@ -122,6 +121,19 @@ public class Cliente extends Activity implements Killable
 	public void killMeSoftly() {
 		ElMatador.getInstance().killThenAll();
 		finish();
+	}
+	
+	public void run()
+	{
+		Log.i(TAG, "Entrou no run");
+		
+	//	viewDoJogo = new ViewDeRede(this, conexao,
+		//		(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
+
+		//setContentView(viewDoJogo);
+		
+		
+		
 	}
 
 	

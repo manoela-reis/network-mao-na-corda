@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import android.util.Log;
 
+import com.example.servidorecliente.bean.Jogador;
 import com.example.servidorecliente.rede.DepoisDeReceberDados;
 import com.example.servidorecliente.rede.Killable;
 
@@ -19,12 +20,20 @@ public class Conexao implements Runnable, Killable {
 	private BufferedReader leitor;
 	private BufferedWriter escritor;
 	private String id;
-
+private Jogador joga;
+	private int x;
 	private Socket conexao;
 	private boolean ativo = true;
 	private Thread escutandoParaSempre;
 	private DepoisDeReceberDados depoisDeReceberDadosHandler;
 
+	public Jogador getJogador(){
+		
+		return joga;
+	}
+	public void Joog(Jogador jogaaa){
+		this.joga=jogaaa;
+	}
 	public String getId() {
 		return id;
 	}
@@ -32,7 +41,15 @@ public class Conexao implements Runnable, Killable {
 	public void setId(String id) {
 		this.id = id;
 	}
+	
 
+	public void setX(int x){
+		this.x=x;
+	}
+	public int GetX(){
+		return x;
+	}
+	
 	/**
 	 * usado para criar objetos de conexao do lado servidor
 	 * 
