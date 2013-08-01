@@ -33,7 +33,7 @@ public class Cliente extends Activity implements Killable, Runnable
 
 //	private EditText editUsuario;
 	private EditText editIP;
-	private String usuario= "Player 1";
+	private String usuario= "Player 2";
 	private ViewDeRede viewDoJogo;
 	private Conexao conexao;
 	public static boolean conectou;
