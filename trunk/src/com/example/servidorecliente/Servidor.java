@@ -32,7 +32,7 @@ public class Servidor extends Activity implements Killable, Runnable
 	public static final String RUN = "run";
 	private static final int PORTA_PADRAO = 2121;
 	private GerenteDEConexao gerente;
-	private String usuario;
+	private String usuario="Player 1";
 	private ViewDeRede viewDoJogo;
 	private Conexao conexao;
 	public EditText your_IP;
