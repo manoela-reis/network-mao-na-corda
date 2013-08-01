@@ -33,7 +33,7 @@ public class Cliente extends Activity implements Killable, Runnable
 
 //	private EditText editUsuario;
 	private EditText editIP;
-	private String usuario;
+	private String usuario= "Player 1";
 	private ViewDeRede viewDoJogo;
 	private Conexao conexao;
 	public static boolean conectou;
@@ -67,7 +67,6 @@ public int count;
 			try {
 				tratadorDeDadosDoCliente = new ControleDeUsuariosCliente();
 				
-				usuario=" jogador 2";
 				Socket s = new Socket(ip, PORTA_PADRAO);
 				conexao = new Conexao(s, usuario, tratadorDeDadosDoCliente);
 				Log.i(TAG, usuario + "XXXXXXXXXXXX");

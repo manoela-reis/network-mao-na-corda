@@ -283,6 +283,7 @@ this.cliente=cliente;
 					if (corda.contains(p, corda.centerY())) {
 
 						AplicarCorda();
+						dadosDoCliente.setX((int)(positionX+10));
 					}
 				}
 				if (impp) {
@@ -432,6 +433,7 @@ Log.i("fooi","entroooooooooou");
 					if (corda.contains(a, corda.centerY())) {
 
 						AplicarCorda();
+						dadosDoCliente.setX((int)(positionX+10));
 
 					}
 
@@ -630,6 +632,7 @@ Log.i("fooi","entroooooooooou");
 		corda.set((int) positionX, (int) positionY, (int) positionX + 200,
 				(int) positionY + 100);
 
+		positionX=dadosDoCliente.getX();
 		canvas.drawBitmap(imagem, null, atual, paint);
 		canvas.drawBitmap(velocidade, null, Velocidade, paint);
 		canvas.drawRect(BarrinhaImpulso, paint);
