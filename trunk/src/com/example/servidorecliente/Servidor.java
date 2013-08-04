@@ -4,26 +4,21 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import android.app.Activity;
+import android.media.AudioManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+
 import com.MaoNaCorda.Game;
 import com.example.servidorecliente.rede.ControleDeUsuariosCliente;
 import com.example.servidorecliente.rede.ControleDeUsuariosServidor;
 import com.example.servidorecliente.rede.DepoisDeReceberDados;
 import com.example.servidorecliente.rede.Killable;
-import com.example.servidorecliente.rede.Protocolo;
 import com.example.servidorecliente.util.DialogHelper;
 import com.example.servidorecliente.util.RedeUtil;
 import com.example.servidorecliente.util.ViewUtil;
-
-import android.media.AudioManager;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.Window;
-import android.widget.EditText;
-import android.widget.Toast;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
 
 public class Servidor extends Activity implements Killable, Runnable
 
@@ -59,7 +54,8 @@ public class Servidor extends Activity implements Killable, Runnable
 		setContentView(R.layout.servidor);
 		
 		 a = new ControleDeUsuariosServidor();
-		
+		usuario="Player 1";
+		MainActivity.GetInstance().getPlayer().setIdentificador(usuario);
 		 thread = new Thread(this);
 		 thread.start();
 		 
@@ -70,8 +66,6 @@ public class Servidor extends Activity implements Killable, Runnable
 
 		try 
 		{
-			
-			String serverIp = RedeUtil.getLocalIpAddress();
 			
 			Log.i(TAG, "criei servidor incialmente.");
 			
@@ -86,53 +80,46 @@ public class Servidor extends Activity implements Killable, Runnable
 
 			// gerente.iniciarServidor(new TratadorDeRedeECO());
 			gerente.iniciarServidor(new ControleDeUsuariosServidor());
+			DepoisDeReceberDados tratadorDeDadosDoCliente = new ControleDeUsuariosCliente();
 
 			Socket s = new Socket("127.0.0.1", PORTA_PADRAO);
 			conexao = new Conexao(s, usuario, tratadorDeDadosDoCliente);
 			//conexao.write(Protocolo.PROTOCOL_ID);
-			
-			
-			viewDoJogo = new ViewDeRede(this, conexao,
-					(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
-			
-			//conexao.write(Protocolo.PROTOCOL_CONNECT);				
-			setContentView(viewDoJogo);
-			
-			Log.i(TAG, "Rede criada.");
-			
-			//your_IP.setVisibility(View.VISIBLE);
-			//aguardando.setVisibility(View.VISIBLE);
-			//	DialogHelper.message(this, "endereco do servidor : " + serverIp);
-			
-			
-		    setTitle("servidor : " + serverIp);
+			String serverIp = RedeUtil.getLocalIpAddress();
+			if (serverIp == null)
+			{
 
-			// garante que view possa recuperar a lista de usuarios atual e
-			// enviar dados pela rede
-		//    b = (Activity) context;
-		 //   game = new Game();
-		
+				DialogHelper.message(this, "Conecte-se a alguma rede");
 
-			//conexao.write(Protocolo.PROTOCOL_CONNECT);				
-			//setContentView(viewDoJogo);
-		
+			} else 
+				{
+				setTitle("servidor : " + serverIp);
+
+				// garante que view possa recuperar a lista de usuarios atual e
+				// enviar dados pela rede
+
 				
-				Toast.makeText(Servidor.this,
-				"Seu IP é: " + serverIp.toString(),	Toast.LENGTH_SHORT).show();
+				viewDoJogo = new ViewDeRede(this, conexao,
+						(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
 				
-				Toast.makeText(Servidor.this,
-						"aguardando conexão!!",	Toast.LENGTH_SHORT).show();
-			//}
-			
+				//conexao.write(Protocolo.PROTOCOL_CONNECT);				
+				setContentView(viewDoJogo);
+			}
 
-		} catch (UnknownHostException e) {
+		} catch (UnknownHostException e)
+		{
 			DialogHelper.error(this, "Erro ao conectar com o servidor",
-					MainActivity.TAG, e);
+					TAG, e);
 
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			DialogHelper.error(this, "Erro ao comunicar com o servidor",
-					MainActivity.TAG, e);
+					TAG, e);
 		}
+	
+			
+		
+		
 		
 		Log.i(TAG, "Esperando conexao ");
 		System.out.print("run");

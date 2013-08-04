@@ -37,7 +37,6 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 
 		if (linha.startsWith(Protocolo.PROTOCOL_ID)) {
 			Log.i(TAG, "Entreou no Protocolo ID");
-			conectou(origem);
 			adicionaNovoUsuario(origem, linha);
 		}
 
@@ -45,34 +44,28 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 			moveUsuario(origem, linha);
 		}
 		
-		if (linha.startsWith(Protocolo.PROTOCOL_CONNECT)) {
-			Log.i(TAG, "Entrou no Protocolo conectar");
-			conectou(origem);
-		}
 		
-		informaTodosUsuarios(origem);
+		
+		informaTodosUsuarios(origem, linha);
 	}
 
-	private void informaTodosUsuarios(Conexao origem) {
-
+	private void informaTodosUsuarios(Conexao origem, String linha) {
 		StringBuffer buffer = new StringBuffer();
 		Iterator iterator = jogadores.keySet().iterator();
 		while (iterator.hasNext()) {
 			String key = (String) iterator.next();
 			Jogador jogador = jogadores.get(key);
+			//jogador.update();
 			buffer.append(jogador.toStringCSV());
-			
 		}
-		origem.write(buffer.toString());
+
+		origem.write(Protocolo.PROTOCOL_MOVE +":"+ buffer.toString());
+		
+		//origem.write(linha);
+
 	}
 	
-	public void conectou(Conexao origem) 
-	{
-		count ++;
-		Log.i(TAG, "Count aumentado" + count
-				);
-		informaTodosUsuarios(origem);
-	}
+	
 
 	
 	private void moveUsuario(Conexao origem, String linha) {
@@ -81,17 +74,8 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 		int y = Integer.parseInt(array[2]);
 
 		
-		/*Iterator iterator = jogadores.keySet().iterator();
-		while (iterator.hasNext()) {
-			String key = (String) iterator.next();
-			Jogador jogador = jogadores.get(key);
-			
-			jogador.setX(x);
-			if(origem.getId()==jogador.getID())
-			origem.Joog(jogador);
-			
-			//jogador.setY(y);
-		}*/
+		Jogador jogador = jogadores.get(origem.getId());
+		jogador.setX(x);
 		//Jogador jogador = jogadores.get(origem.getId());
 		//jogador.setX(x);
 		//jogador.setY(y);

@@ -28,8 +28,8 @@ public class DadosDoCliente implements Runnable, Killable {
 			} catch (InterruptedException e) {
 				Log.e(MainActivity.TAG, "interrupcao do run()");
 			}
-
 			cliente.write(Protocolo.PROTOCOL_MOVE + "," + x + "," + y);
+			
 
 		}
 
@@ -41,6 +41,8 @@ public class DadosDoCliente implements Runnable, Killable {
 
 	public void setX(int x) {
 		this.x = x;
+		
+
 	}
 
 	public int getY() {
