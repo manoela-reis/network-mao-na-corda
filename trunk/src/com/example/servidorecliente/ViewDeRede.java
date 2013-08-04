@@ -39,7 +39,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	private ControleDeUsuariosCliente tratadorDeDadosDoCliente;
 	private DadosDoCliente dadosDoCliente;
 	private boolean ativo = true;
-	Jogador jogadoor ;
+	Jogador jogadoor;
 
 	// meninas
 	int q;
@@ -80,24 +80,27 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	private Queue<MotionEvent> fila;
 	private SparseArray<PointF> dedos = new SparseArray<PointF>();
 	Conexao cliente;
+
 	public ViewDeRede(Context context, Conexao cliente,
 			ControleDeUsuariosCliente tratadorDeDadosDoCliente) {
 
 		super(context);
 		ElMatador.getInstance().add(this);
-this.cliente=cliente;
+
+		this.tratadorDeDadosDoCliente = tratadorDeDadosDoCliente;
+		// this.tratadorDeDadosDoCliente.iniciarJogo();
+		this.cliente = cliente;
+
 		// envia estado atual do cliente para o servidor
 		dadosDoCliente = new DadosDoCliente(cliente, UPDATE_TIME);
 		Thread threadDados = new Thread(dadosDoCliente);
 		threadDados.start();
-			//jogadoor=cliente.getJogador();
-		
+		// jogadoor=cliente.getJogador();
 
-		this.tratadorDeDadosDoCliente = tratadorDeDadosDoCliente;
-
+		Jogador meuJogador = MainActivity.GetInstance().getPlayer();
 		// primeira mensagem
-		cliente.write(Protocolo.PROTOCOL_ID + "," + cliente.getId() + ",0,0");
-
+		cliente.write(Protocolo.PROTOCOL_ID + "," + meuJogador.getID() + ","
+				+ meuJogador.getX() + "," + meuJogador.getY());
 		// meninas
 		setFocusableInTouchMode(true);
 		setClickable(true);
@@ -109,7 +112,7 @@ this.cliente=cliente;
 		impulso = img.ImageManager("amarelo.png", context);
 		velocidade = img.ImageManager("amarelo.png", context);
 		massa = img.ImageManager("amarelo.png", context);
-		
+
 		Thread processo = new Thread(this);
 		processo.start();
 
@@ -125,15 +128,13 @@ this.cliente=cliente;
 		int larguraBarra = (int) getWidth() / 15;
 		int alturaBarra = (int) getHeight() / 15;
 		CreateBarrinhas(larguraBarra, alturaBarra);
-		
+
 		Width = getWidth() / 2;
 		Height = getHeight() / 2;
 		positionX = Width;
 		positionY = Height;
-		//dadosDoCliente.setX((int)positionX);
-		//dadosDoCliente.setY((int)positionY);
-	
-		
+		// dadosDoCliente.setX((int)positionX);
+		// dadosDoCliente.setY((int)positionY);
 
 	}
 
@@ -171,7 +172,6 @@ this.cliente=cliente;
 			if (action == MotionEvent.ACTION_DOWN) {
 				int id = event.getPointerId(event.getActionIndex());
 
-
 				q = (int) event.getX(id);
 				r = (int) event.getY(id);
 				Log.d("vamos", "" + q);
@@ -180,7 +180,6 @@ this.cliente=cliente;
 					BotImpulso();
 
 					PriTouch = "Impulso";
-					
 
 					PointF point = new PointF(event.getX(id), event.getY(id));
 					dedos.put(id, point);
@@ -215,13 +214,10 @@ this.cliente=cliente;
 
 				Log.i("foi", "down baby down !! " + PriTouch);
 
-
 			}
 			if (action == MotionEvent.ACTION_POINTER_DOWN) {
-				
 
 				int id = event.getPointerId(event.getActionIndex());
-
 
 				segTouchX = (int) event.getX(id);
 				segTouchY = (int) event.getY(id);
@@ -232,7 +228,8 @@ this.cliente=cliente;
 						BotImpulso();
 						SegTouch = "Impulso";
 
-						PointF point = new PointF(event.getX(id), event.getY(id));
+						PointF point = new PointF(event.getX(id),
+								event.getY(id));
 
 						dedos.put(id, point);
 					}
@@ -240,7 +237,8 @@ this.cliente=cliente;
 						BotVelocidade();
 						SegTouch = "Velocidade";
 
-						PointF point = new PointF(event.getX(id), event.getY(id));
+						PointF point = new PointF(event.getX(id),
+								event.getY(id));
 
 						dedos.put(id, point);
 
@@ -249,7 +247,8 @@ this.cliente=cliente;
 						BotMassa();
 						SegTouch = "Massa";
 
-						PointF point = new PointF(event.getX(id), event.getY(id));
+						PointF point = new PointF(event.getX(id),
+								event.getY(id));
 
 						dedos.put(id, point);
 					}
@@ -260,13 +259,14 @@ this.cliente=cliente;
 						SegTouch = "corda";
 						possivel = true;
 
-						PointF point = new PointF(event.getX(id), event.getY(id));
+						PointF point = new PointF(event.getX(id),
+								event.getY(id));
 
 						dedos.put(id, point);
 					}
 				}
-				Log.i("foi", "dsegundo !! "+ SegTouch +"primeiro:  "+ PriTouch+"boool:   " + impp.booleanValue());
-				
+				Log.i("foi", "dsegundo !! " + SegTouch + "primeiro:  "
+						+ PriTouch + "boool:   " + impp.booleanValue());
 
 			}
 
@@ -275,70 +275,75 @@ this.cliente=cliente;
 				int id = event.getPointerId(event.getActionIndex());
 				p = (int) event.getX(id);
 				t = (int) event.getY(id);
-				
-				if(dedos.get(id)!= null){
+
+				if (dedos.get(id) != null) {
 
 					PointF point = (PointF) dedos.get(id);
-				if (possivel) {
-					if (corda.contains(p, corda.centerY())) {
+					if (possivel) {
+						if (corda.contains(p, corda.centerY())) {
 
-						AplicarCorda();
-						dadosDoCliente.setX((int)(positionX+10));
-					}
-				}
-				if (impp) {
-					if (point.x == q && PriTouch != "corda") {
-						if (Impulso.contains(a, Impulso.centerY())
-								|| Velocidade.contains(a, Velocidade.centerY())
-								|| Massa.contains(a, Massa.centerY())) {
-							if (Impulso.contains(a, Impulso.centerY())) {
-								CalcularImpulso();
-							}
-							if (Velocidade.contains(a, Velocidade.centerY())) {
-								CalcularVelocidade();
-							}
-							if (Massa.contains(a, Massa.centerY())) {
-								CalcularMassa();
-							}
-
-						} else {
-							impp = false;
-							PriTouch = SegTouch;
-							SegTouch = "";
-
-					
-						}
-					}
-					if (point.x == segTouchX && SegTouch != "corda") {
-						if (Impulso.contains(a, Impulso.centerY())
-								|| Velocidade.contains(a, Velocidade.centerY())
-								|| Massa.contains(a, Massa.centerY())) {
-							if (Impulso.contains(a, Impulso.centerY())) {
-								CalcularImpulso();
-							}
-							if (Velocidade.contains(a, Velocidade.centerY())) {
-								CalcularVelocidade();
-							}
-							if (Massa.contains(a, Massa.centerY())) {
-								CalcularMassa();
-
-							}
-						} else {
-							impp = false;
-							SegTouch = "";
-
-							Log.i("foi", "dsegundo UP!! "+ SegTouch +"primeiro:  "+ PriTouch+"boool:   " + impp.booleanValue());
+							AplicarCorda();
 
 						}
 					}
-				}
+					if (impp) {
+						if (point.x == q && PriTouch != "corda") {
+							if (Impulso.contains(a, Impulso.centerY())
+									|| Velocidade.contains(a,
+											Velocidade.centerY())
+									|| Massa.contains(a, Massa.centerY())) {
+								if (Impulso.contains(a, Impulso.centerY())) {
+									CalcularImpulso();
+								}
+								if (Velocidade
+										.contains(a, Velocidade.centerY())) {
+									CalcularVelocidade();
+								}
+								if (Massa.contains(a, Massa.centerY())) {
+									CalcularMassa();
+								}
 
-				dedos.remove(id);
+							} else {
+								impp = false;
+								PriTouch = SegTouch;
+								SegTouch = "";
+
+							}
+						}
+						if (point.x == segTouchX && SegTouch != "corda") {
+							if (Impulso.contains(a, Impulso.centerY())
+									|| Velocidade.contains(a,
+											Velocidade.centerY())
+									|| Massa.contains(a, Massa.centerY())) {
+								if (Impulso.contains(a, Impulso.centerY())) {
+									CalcularImpulso();
+								}
+								if (Velocidade
+										.contains(a, Velocidade.centerY())) {
+									CalcularVelocidade();
+								}
+								if (Massa.contains(a, Massa.centerY())) {
+									CalcularMassa();
+
+								}
+							} else {
+								impp = false;
+								SegTouch = "";
+
+								Log.i("foi", "dsegundo UP!! " + SegTouch
+										+ "primeiro:  " + PriTouch
+										+ "boool:   " + impp.booleanValue());
+
+							}
+						}
+					}
+
+					dedos.remove(id);
 				}
 			}
 
 			if (action == MotionEvent.ACTION_MOVE) {
-				Log.i("fooi","movendoooo");
+				Log.i("fooi", "movendoooo");
 
 				int d = event.getPointerId(event.getActionIndex());
 				for (int i = 0; i < event.getPointerCount(); i++) {
@@ -357,7 +362,7 @@ this.cliente=cliente;
 										possivel = false;
 										dedos.remove(id);
 									}
-								}else{
+								} else {
 									aplicarForca((int) ((event.getX(id) - q) / 3));
 									possivel = false;
 									dedos.remove(id);
@@ -375,7 +380,7 @@ this.cliente=cliente;
 										dedos.remove(id);
 									}
 
-								}else{
+								} else {
 									aplicarForca((int) ((event.getX(id) - q) / 3));
 									possivel = false;
 									dedos.remove(id);
@@ -393,11 +398,11 @@ this.cliente=cliente;
 												Velocidade.centerY())) {
 								} else {
 
-Log.i("fooi","entroooooooooou");
+									Log.i("fooi", "entroooooooooou");
 									impp = false;
 									PriTouch = SegTouch;
 									SegTouch = "";
-								dedos.remove(id);
+									dedos.remove(id);
 								}
 
 							}
@@ -433,7 +438,6 @@ Log.i("fooi","entroooooooooou");
 					if (corda.contains(a, corda.centerY())) {
 
 						AplicarCorda();
-						dadosDoCliente.setX((int)(positionX+10));
 
 					}
 
@@ -480,16 +484,14 @@ Log.i("fooi","entroooooooooou");
 					}
 				}
 
-				Log.i("foi", "UP !!!" + SegTouch +"primeiro:  "+ PriTouch+"boool:   " + impp.booleanValue());
+				Log.i("foi", "UP !!!" + SegTouch + "primeiro:  " + PriTouch
+						+ "boool:   " + impp.booleanValue());
 				dedos.remove(id);
 			}
 		}
 
 	}
 
-	
-	
-	
 	private void AplicarCorda() {
 		// TODO Auto-generated method stub
 		if (PriTouch == "corda") {
@@ -508,6 +510,7 @@ Log.i("fooi","entroooooooooou");
 
 			}
 		}
+		dadosDoCliente.setX((int) (positionX + 10));
 	}
 
 	private void BotMassa() {
@@ -530,19 +533,18 @@ Log.i("fooi","entroooooooooou");
 
 	private void aplicarForca(int i) {
 
-		//positionX+=i;
-		positionX=Width;
+		// positionX+=i;
 
-		//dadosDoCliente.setY(5);
-		/*if(cliente!=null){
-		//cliente.write(Protocolo.PROTOCOL_MOVE + "," + cliente.getId() + ","+positionX+20+","+positionY);
-			dadosDoCliente.setX((int)positionX+30);
-		jogadoor=cliente.getJogador();
-		}
-		
-			positionX=jogadoor.getX();
-		*/
-		//positionX =cliente.GetX();
+		// dadosDoCliente.setY(5);
+		/*
+		 * if(cliente!=null){ //cliente.write(Protocolo.PROTOCOL_MOVE + "," +
+		 * cliente.getId() + ","+positionX+20+","+positionY);
+		 * dadosDoCliente.setX((int)positionX+30);
+		 * jogadoor=cliente.getJogador(); }
+		 * 
+		 * positionX=jogadoor.getX();
+		 */
+		// positionX =cliente.GetX();
 		if (Num_impulso == 30000) {
 			if (BarrinhaImpulso.right - BarrinhaImpulso.left >= 3) {
 				Forca = (int) (Forca * 1.3f);
@@ -579,7 +581,7 @@ Log.i("fooi","entroooooooooou");
 		}
 		Forca = i;
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void CalcularImpulso() {
@@ -632,9 +634,23 @@ Log.i("fooi","entroooooooooou");
 		corda.set((int) positionX, (int) positionY, (int) positionX + 200,
 				(int) positionY + 100);
 
-		positionX=dadosDoCliente.getX();
 		canvas.drawBitmap(imagem, null, atual, paint);
 		canvas.drawBitmap(velocidade, null, Velocidade, paint);
+
+		ConcurrentHashMap<String, Jogador> jogadores = tratadorDeDadosDoCliente
+				.getJogadores();
+
+		Iterator<String> iterator = jogadores.keySet().iterator();
+
+		while (iterator.hasNext()) {
+			String key = iterator.next();
+			Jogador jogador = jogadores.get(key);
+
+			Num_impulso = jogador.getX();
+
+			Log.e("Vieew", ""+jogador.getX());
+		}
+
 		canvas.drawRect(BarrinhaImpulso, paint);
 		canvas.drawRect(BarrinhaVelocidade, paint);
 		canvas.drawRect(BarrinhaMassa, paint);
@@ -656,8 +672,9 @@ Log.i("fooi","entroooooooooou");
 
 		canvas.drawText("Massa", BarrinhaMassa.left + 55, BarrinhaMassa.bottom,
 				paint);
-	//	positionX=dadosDoCliente.se();
+		// positionX=dadosDoCliente.se();
 	}
+
 	public void run() {
 		Log.i(TAG, "Entrou no run.");
 		while (ativo) {
@@ -674,15 +691,15 @@ Log.i("fooi","entroooooooooou");
 
 	private void update() {
 
+		// tratadorDeDadosDoCliente.execute(cliente, cliente + "," +
+		// dadosDoCliente.getX() + "," +dadosDoCliente.getY() +";");
 
-		//tratadorDeDadosDoCliente.execute(cliente, cliente + "," + dadosDoCliente.getX() + "," +dadosDoCliente.getY() +";");
-		
-		//jogadores=tratadorDeDadosDoCliente.getJogadores();
-		//jogadoor=jogadores.get(cliente.getId());
-		
-		//positionX=cliente.GetX();
-				//positionX=dadosDoCliente.getX();
-		//positionY= dadosDoCliente.getY();
+		// jogadores=tratadorDeDadosDoCliente.getJogadores();
+		// jogadoor=jogadores.get(cliente.getId());
+
+		// positionX=cliente.GetX();
+		// positionX=dadosDoCliente.getX();
+		// positionY= dadosDoCliente.getY();
 		if (period != 0) {
 			counter++;
 		}
@@ -691,47 +708,46 @@ Log.i("fooi","entroooooooooou");
 			period--;
 			counter = 0;
 			current += 1000;
-//if(impp){
-				if (current - counter >= 100) {
+			// if(impp){
+			if (current - counter >= 100) {
 
-					if (SegTouch == "Impulso" || PriTouch == "Impulso") {
-						if (BarrinhaImpulso.right - BarrinhaImpulso.left < 50) {
-							if (BarrinhaImpulso.right + 3
-									- BarrinhaImpulso.left > 50) {
-								BarrinhaImpulso.right = 50 + BarrinhaImpulso.left;
+				if (SegTouch == "Impulso" || PriTouch == "Impulso") {
+					if (BarrinhaImpulso.right - BarrinhaImpulso.left < 50) {
+						if (BarrinhaImpulso.right + 3 - BarrinhaImpulso.left > 50) {
+							BarrinhaImpulso.right = 50 + BarrinhaImpulso.left;
 
-							} else {
-								BarrinhaImpulso.right += 3;
-							}
-
+						} else {
+							BarrinhaImpulso.right += 3;
 						}
+
 					}
-					if (SegTouch == "Velocidade" || PriTouch == "Velocidade") {
-						if (BarrinhaVelocidade.right - BarrinhaVelocidade.left < 50) {
-							if (BarrinhaVelocidade.right + 3
-									- BarrinhaVelocidade.left > 50) {
-								BarrinhaVelocidade.right = 50 + BarrinhaVelocidade.left;
+				}
+				if (SegTouch == "Velocidade" || PriTouch == "Velocidade") {
+					if (BarrinhaVelocidade.right - BarrinhaVelocidade.left < 50) {
+						if (BarrinhaVelocidade.right + 3
+								- BarrinhaVelocidade.left > 50) {
+							BarrinhaVelocidade.right = 50 + BarrinhaVelocidade.left;
 
-							} else {
+						} else {
 
-								BarrinhaVelocidade.right += 3;
-							}
-						}
-					}
-					if (SegTouch == "Massa" || PriTouch == "Massa") {
-						if (BarrinhaMassa.right - BarrinhaMassa.left < 50) {
-							if (BarrinhaMassa.right + 3 - BarrinhaMassa.left > 50) {
-								BarrinhaMassa.right = 50 + BarrinhaMassa.left;
-
-							} else {
-								BarrinhaMassa.right += 3;
-							}
+							BarrinhaVelocidade.right += 3;
 						}
 					}
 				}
-				
+				if (SegTouch == "Massa" || PriTouch == "Massa") {
+					if (BarrinhaMassa.right - BarrinhaMassa.left < 50) {
+						if (BarrinhaMassa.right + 3 - BarrinhaMassa.left > 50) {
+							BarrinhaMassa.right = 50 + BarrinhaMassa.left;
+
+						} else {
+							BarrinhaMassa.right += 3;
+						}
+					}
+				}
 			}
-		//}
+
+		}
+		// }
 		processEventQueue();
 
 	}
