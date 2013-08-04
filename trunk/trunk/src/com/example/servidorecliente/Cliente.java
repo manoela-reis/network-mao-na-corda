@@ -47,6 +47,8 @@ public int count;
 		setContentView(R.layout.cliente);
 		Log.i(TAG, "entrei no OnCreate cliente ");
 		
+		usuario="Player 2";
+		MainActivity.GetInstance().getPlayer().setIdentificador(usuario);
 		editIP = (EditText) findViewById(R.id.editText1);
 	}
 	
@@ -65,12 +67,11 @@ public int count;
 		}
 
 			try {
-				tratadorDeDadosDoCliente = new ControleDeUsuariosCliente();
+				DepoisDeReceberDados tratadorDeDadosDoCliente = new ControleDeUsuariosCliente();
 				
 				Socket s = new Socket(ip, PORTA_PADRAO);
 				conexao = new Conexao(s, usuario, tratadorDeDadosDoCliente);
 				Log.i(TAG, usuario + "XXXXXXXXXXXX");
-				conexao.write(Protocolo.PROTOCOL_CONNECT);
 				
 				viewDoJogo = new ViewDeRede(this, conexao,
 					(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);

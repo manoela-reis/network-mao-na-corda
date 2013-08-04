@@ -1,38 +1,45 @@
 package com.example.servidorecliente;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 
-import com.example.servidorecliente.rede.ControleDeUsuariosCliente;
-import com.example.servidorecliente.rede.ControleDeUsuariosServidor;
-import com.example.servidorecliente.rede.DepoisDeReceberDados;
-import com.example.servidorecliente.rede.Killable;
-import com.example.servidorecliente.util.DialogHelper;
-import com.example.servidorecliente.util.RedeUtil;
-import com.example.servidorecliente.util.ViewUtil;
+import com.example.servidorecliente.bean.Jogador;
 
 public class MainActivity extends Activity 
 {
 	public static final String TAG = "MainActivity";
+	public static MainActivity Instance;
+
+	private Jogador meuPlayer;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		MainActivity Inst = this;
+		Instance = Inst;
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		
+
+		meuPlayer = new Jogador("", 100, 50);
 	}
+
+	public static MainActivity GetInstance(){
+		return Instance;
+	}
+	public Jogador getPlayer(){
+		return meuPlayer;
+	}
+	public void killMeSoftly() {
+		ElMatador.getInstance().killThenAll();
+		finish();
+	}
+	
 	
 	// Servidor/Cliente
 	public void servidor(View sender)
@@ -87,10 +94,7 @@ public class MainActivity extends Activity
 	/**
 	 * realiza limpeza dos threads em funcionamento
 	 
-	public void killMeSoftly() {
-		ElMatador.getInstance().killThenAll();
-		finish();
-	}*/
+	*/
 
 }
 
