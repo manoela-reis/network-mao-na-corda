@@ -26,7 +26,7 @@ public class MainActivity extends Activity
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		
 
-		meuPlayer = new Jogador("", 100, 50);
+		meuPlayer = new Jogador("", 100, "Aspirante");
 	}
 
 	public static MainActivity GetInstance(){
@@ -59,11 +59,7 @@ public class MainActivity extends Activity
 		startActivity(i);		
 	}
 
-/*	public void salvarUsuario(View sender) {
-		ViewUtil.closeKeyboard(this);
-		usuario = editUsuario.getText().toString();
-		Log.i(TAG, "usuario salvo:" + usuario);
-	}*/
+
 
 
 	/**

@@ -85,10 +85,10 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 		String[] array = linha.split(",");
 		String nome = array[1];
 		int x = Integer.parseInt(array[2]);
-		int y = Integer.parseInt(array[3]);
+		String patente= array[3];
 		
 		origem.setId(nome);
-		Jogador jogador = new Jogador(nome, x, y);
+		Jogador jogador = new Jogador(nome, x, patente);
 		jogadores.put(nome, jogador);
 		
 	}

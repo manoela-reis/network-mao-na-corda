@@ -100,7 +100,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		Jogador meuJogador = MainActivity.GetInstance().getPlayer();
 		// primeira mensagem
 		cliente.write(Protocolo.PROTOCOL_ID + "," + meuJogador.getID() + ","
-				+ meuJogador.getX() + "," + meuJogador.getY());
+				+ meuJogador.getX() +","+ meuJogador.getPatente());
+						
 		// meninas
 		setFocusableInTouchMode(true);
 		setClickable(true);
@@ -545,6 +546,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		 * positionX=jogadoor.getX();
 		 */
 		// positionX =cliente.GetX();
+		 positionX =Width;
 		if (Num_impulso == 30000) {
 			if (BarrinhaImpulso.right - BarrinhaImpulso.left >= 3) {
 				Forca = (int) (Forca * 1.3f);
@@ -586,6 +588,13 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 	private void CalcularImpulso() {
 		impp = false;
+		dadosDoCliente.setX(0);
+
+		int larguraBarra = (int) getWidth() / 15;
+		int alturaBarra = (int) getHeight() / 15;
+
+		BarrinhaImpulso.set(larguraBarra, 2 * alturaBarra,
+				(int) (1.5f * larguraBarra), (int) (2.5f * alturaBarra));
 		if (current - counter <= 100) {
 			Num_impulso = 30000;
 			current = 0;
@@ -601,6 +610,11 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 	private void CalcularMassa() {
 		impp = false;
+		dadosDoCliente.setX(0);
+		int larguraBarra = (int) getWidth() / 15;
+		int alturaBarra = (int) getHeight() / 15;
+		BarrinhaImpulso.set(larguraBarra, 2 * alturaBarra,
+				(int) (1.5f * larguraBarra), (int) (2.5f * alturaBarra));
 		if (current - counter <= 100) {
 			Num_impulso = 10000;
 
@@ -616,6 +630,12 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	private void CalcularVelocidade() {
 
 		impp = false;
+		dadosDoCliente.setX(0);
+
+		int larguraBarra = (int) getWidth() / 15;
+		int alturaBarra = (int) getHeight() / 15;
+		BarrinhaImpulso.set(larguraBarra, 2 * alturaBarra,
+				(int) (1.5f * larguraBarra), (int) (2.5f * alturaBarra));
 		if (current - counter <= 100) {
 			Num_impulso = 20000;
 			current = 0;
@@ -646,7 +666,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 			String key = iterator.next();
 			Jogador jogador = jogadores.get(key);
 
-			Num_impulso = jogador.getX();
+			BarrinhaImpulso.left += jogador.getX();
 
 			Log.e("Vieew", ""+jogador.getX());
 		}
@@ -717,7 +737,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 							BarrinhaImpulso.right = 50 + BarrinhaImpulso.left;
 
 						} else {
-							BarrinhaImpulso.right += 3;
+							//BarrinhaImpulso.right += 3;
+							dadosDoCliente.setX(3);
 						}
 
 					}
@@ -730,7 +751,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 						} else {
 
-							BarrinhaVelocidade.right += 3;
+							//BarrinhaVelocidade.right += 3;
+							dadosDoCliente.setX(3);
 						}
 					}
 				}
@@ -740,7 +762,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 							BarrinhaMassa.right = 50 + BarrinhaMassa.left;
 
 						} else {
-							BarrinhaMassa.right += 3;
+							//BarrinhaMassa.right += 3;
+							dadosDoCliente.setX(3);
 						}
 					}
 				}
