@@ -41,15 +41,14 @@ public class ControleDeUsuariosCliente implements DepoisDeReceberDados {
 			String[] separado = um.split(",");
 			String nome = separado[0];
 			int x = Integer.parseInt(separado[1]);
-			int y = Integer.parseInt(separado[2]);
+			
 
 			Jogador jogador = jogadores.get(nome);
 			if (jogador == null) {
-				jogador = new Jogador(nome, x, y);
+				jogador = new Jogador(nome, x,"Aspirante");
 				jogadores.put(nome, jogador);
 			} else {
 				jogador.setX(x);
-				jogador.setY(y);
 
 			}
 		}
