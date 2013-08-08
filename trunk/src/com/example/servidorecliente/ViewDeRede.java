@@ -3,6 +3,7 @@ package com.example.servidorecliente;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android.content.Context;
@@ -30,16 +31,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	// acho q é aqui q o jogo "acontece" -> acho q aqui q entrará o código das
 	// meninas.
 
-	private static final String TAG = "view-rede";
-	private static final int UPDATE_TIME = 100;
 	// private Paint paint;
 	private long time = 1;
-
-	private ConcurrentHashMap<String, Jogador> jogadores;
-	private ControleDeUsuariosCliente tratadorDeDadosDoCliente;
-	private DadosDoCliente dadosDoCliente;
-	private boolean ativo = true;
-	Jogador jogadoor;
 
 	// meninas
 	int q;
@@ -48,38 +41,64 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	int t;
 	int a;
 	int b;
-	Boolean possivel = false;
+	int c = -1;
+	int n = 0;
+
+	private int counter;
+	private int coolDown = 0;
+	private int counterIten = 1000;
+	private int period = 100;
+	private int current;
+	int Forca;
+	int Num_impulso;
+	private int segTouchX;
+	private int segTouchY;
+	private static final int UPDATE_TIME = 100;
+
 	static Rect atual = new Rect();
 	static Rect corda = new Rect();
 	static Rect Impulso = new Rect();
 	static Rect Massa = new Rect();
 	static Rect Velocidade = new Rect();
+	static Rect ItemEsp = new Rect();
 	static Rect BarrinhaImpulso = new Rect();
 	static Rect BarrinhaVelocidade = new Rect();
 	static Rect BarrinhaMassa = new Rect();
-	private int counter;
-	private int period = 100;
-	private int current;
+
 	Paint paint = new Paint();
+
 	static float positionX = 40;
 	private static float positionY = 30;
 	private static float Width = 30;
 	private static float Height = 30;
+
 	ImageManager img;
+	Conexao cliente;
+	Jogador jogadoor;
+	private ControleDeUsuariosCliente tratadorDeDadosDoCliente;
+	private DadosDoCliente dadosDoCliente;
+
 	Bitmap imagem;
 	Bitmap impulso;
 	Bitmap velocidade;
 	Bitmap massa;
-	int Forca;
-	int Num_impulso;
+	Bitmap itemEsp;
+
+	Boolean CoolDown = false;
 	Boolean impp = false;
-	private int segTouchX;
-	private int segTouchY;
+	Boolean possivel = false;
+	private boolean ok;
+	private boolean ativo = true;
+
 	String SegTouch;
 	String PriTouch;
+	private static final String TAG = "view-rede";
+
+	Random rnd = new Random();
+
+	private ConcurrentHashMap<String, Jogador> jogadores;
 	private Queue<MotionEvent> fila;
 	private SparseArray<PointF> dedos = new SparseArray<PointF>();
-	Conexao cliente;
 
 	public ViewDeRede(Context context, Conexao cliente,
 			ControleDeUsuariosCliente tratadorDeDadosDoCliente) {
@@ -100,8 +119,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		Jogador meuJogador = MainActivity.GetInstance().getPlayer();
 		// primeira mensagem
 		cliente.write(Protocolo.PROTOCOL_ID + "," + meuJogador.getID() + ","
-				+ meuJogador.getX() +","+ meuJogador.getPatente());
-						
+				+ meuJogador.getX() + "," + meuJogador.getPatente());
+
 		// meninas
 		setFocusableInTouchMode(true);
 		setClickable(true);
@@ -113,6 +132,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		impulso = img.ImageManager("amarelo.png", context);
 		velocidade = img.ImageManager("amarelo.png", context);
 		massa = img.ImageManager("amarelo.png", context);
+		itemEsp = img.ImageManager("amarelo.png", context);
 
 		Thread processo = new Thread(this);
 		processo.start();
@@ -149,12 +169,14 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	}
 
 	public void CreateItens(int larguraItem, int alturaItem) {
-		Impulso.set(larguraItem, 6 * alturaItem, (int) (2.1f * larguraItem),
-				(int) (7.5f * alturaItem));
-		Velocidade.set((int) (2.3f * larguraItem), 6 * alturaItem,
-				(int) (3.3f * larguraItem), (int) (7.5f * alturaItem));
-		Massa.set((int) (3.5f * larguraItem), 6 * alturaItem,
-				(int) (4.5f * larguraItem), (int) (7.5f * alturaItem));
+		Impulso.set((int) 2f * larguraItem, 8 * alturaItem,
+				(int) (3.3f * larguraItem), (int) (9.5f * alturaItem));
+		Velocidade.set((int) (3.5f * larguraItem), 8 * alturaItem,
+				(int) (4.8f * larguraItem), (int) (9.5f * alturaItem));
+		Massa.set((int) (5f * larguraItem), 8 * alturaItem,
+				(int) (6.3f * larguraItem), (int) (9.5f * alturaItem));
+		ItemEsp.set((int) (6.5f * larguraItem), 8 * alturaItem,
+				(int) (7.8f * larguraItem), (int) (9.5f * alturaItem));
 
 	}
 
@@ -197,6 +219,14 @@ public class ViewDeRede extends View implements Runnable, Killable {
 				if (Massa.contains(q, r)) {
 					BotMassa();
 					PriTouch = "Massa";
+
+					PointF point = new PointF(event.getX(id), event.getY(id));
+					dedos.put(id, point);
+
+				}
+				if (ItemEsp.contains(q, r)) {
+					BotIten();
+					PriTouch = "ItemEsp";
 
 					PointF point = new PointF(event.getX(id), event.getY(id));
 					dedos.put(id, point);
@@ -253,6 +283,15 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 						dedos.put(id, point);
 					}
+					if (ItemEsp.contains(segTouchX, segTouchY)) {
+						BotIten();
+						SegTouch = "ItemEsp";
+
+						PointF point = new PointF(event.getX(id),
+								event.getY(id));
+
+						dedos.put(id, point);
+					}
 
 				}
 				if (possivel == false) {
@@ -292,7 +331,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 							if (Impulso.contains(a, Impulso.centerY())
 									|| Velocidade.contains(a,
 											Velocidade.centerY())
-									|| Massa.contains(a, Massa.centerY())) {
+									|| Massa.contains(a, Massa.centerY())
+									|| ItemEsp.contains(a, ItemEsp.centerY())) {
 								if (Impulso.contains(a, Impulso.centerY())) {
 									CalcularImpulso();
 								}
@@ -302,6 +342,10 @@ public class ViewDeRede extends View implements Runnable, Killable {
 								}
 								if (Massa.contains(a, Massa.centerY())) {
 									CalcularMassa();
+								}
+								if (ItemEsp.contains(a, ItemEsp.centerY())) {
+									CalcularIten();
+									CoolDown = true;
 								}
 
 							} else {
@@ -315,7 +359,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 							if (Impulso.contains(a, Impulso.centerY())
 									|| Velocidade.contains(a,
 											Velocidade.centerY())
-									|| Massa.contains(a, Massa.centerY())) {
+									|| Massa.contains(a, Massa.centerY())
+									|| ItemEsp.contains(a, ItemEsp.centerY())) {
 								if (Impulso.contains(a, Impulso.centerY())) {
 									CalcularImpulso();
 								}
@@ -325,6 +370,10 @@ public class ViewDeRede extends View implements Runnable, Killable {
 								}
 								if (Massa.contains(a, Massa.centerY())) {
 									CalcularMassa();
+
+								}
+								if (ItemEsp.contains(a, ItemEsp.centerY())) {
+									CalcularIten();
 
 								}
 							} else {
@@ -396,7 +445,10 @@ public class ViewDeRede extends View implements Runnable, Killable {
 												Massa.centerY())
 										|| Velocidade.contains(
 												(int) event.getX(id),
-												Velocidade.centerY())) {
+												Velocidade.centerY())
+										|| ItemEsp.contains(
+												(int) event.getX(id),
+												ItemEsp.centerY())) {
 								} else {
 
 									Log.i("fooi", "entroooooooooou");
@@ -415,7 +467,10 @@ public class ViewDeRede extends View implements Runnable, Killable {
 												Massa.centerY())
 										|| Velocidade.contains(
 												(int) event.getX(id),
-												Velocidade.centerY())) {
+												Velocidade.centerY())
+										|| ItemEsp.contains(
+												(int) event.getX(id),
+												ItemEsp.centerY())) {
 								} else {
 									impp = false;
 									SegTouch = "";
@@ -446,7 +501,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 				if (impp) {
 					if (point.x == q && PriTouch != "corda") {
 						if (Impulso.contains(a, b) || Velocidade.contains(a, b)
-								|| Massa.contains(a, b)) {
+								|| Massa.contains(a, b)
+								|| ItemEsp.contains(a, b)) {
 							if (Impulso.contains(a, b)) {
 								CalcularImpulso();
 							}
@@ -455,6 +511,9 @@ public class ViewDeRede extends View implements Runnable, Killable {
 							}
 							if (Massa.contains(a, b)) {
 								CalcularMassa();
+							}
+							if (ItemEsp.contains(a, b)) {
+								CalcularIten();
 							}
 
 						} else {
@@ -466,7 +525,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 					}
 					if (point.x == segTouchX && SegTouch != "corda") {
 						if (Impulso.contains(a, b) || Velocidade.contains(a, b)
-								|| Massa.contains(a, b)) {
+								|| Massa.contains(a, b)
+								|| ItemEsp.contains(a, b)) {
 							if (Impulso.contains(a, b)) {
 								CalcularImpulso();
 							}
@@ -475,6 +535,9 @@ public class ViewDeRede extends View implements Runnable, Killable {
 							}
 							if (Massa.contains(a, b)) {
 								CalcularMassa();
+							}
+							if (ItemEsp.contains(a, b)) {
+								CalcularIten();
 							}
 
 						} else {
@@ -532,6 +595,11 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		current = period;
 	}
 
+	private void BotIten() {
+		impp = true;
+		// current = period;
+	}
+
 	private void aplicarForca(int i) {
 
 		// positionX+=i;
@@ -546,7 +614,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		 * positionX=jogadoor.getX();
 		 */
 		// positionX =cliente.GetX();
-		 positionX =Width;
+
+		positionX = Width;
 		if (Num_impulso == 30000) {
 			if (BarrinhaImpulso.right - BarrinhaImpulso.left >= 3) {
 				Forca = (int) (Forca * 1.3f);
@@ -647,15 +716,48 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		}
 	}
 
+	private void CalcularIten() {
+
+		impp = false;
+
+		Log.i("partida", "" + n);
+
+		if (c == 0) {
+			Num_impulso = 10000;
+			CoolDown = true;
+			coolDown = 10;
+		}
+		if (c == 1) {
+			Num_impulso = 20000;
+			CoolDown = true;
+			coolDown = 10;
+		}
+		if (c == 2) {
+			Num_impulso = 30000;
+			CoolDown = true;
+			coolDown = 10;
+		}
+
+		if (PriTouch == "Velocidade") {
+			PriTouch = SegTouch;
+			SegTouch = "";
+			q = segTouchX;
+		}
+
+	}
+
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
 
 		atual.set(0, 0, (int) Width * 2, (int) Height * 2);
-		corda.set((int) positionX, (int) positionY, (int) positionX + 200,
-				(int) positionY + 100);
+		corda.set((int) positionX, (int) positionY - getWidth() / 25,
+				(int) (positionX + getWidth() / 3),
+				(int) (positionY + getWidth() / 25));
 
 		canvas.drawBitmap(imagem, null, atual, paint);
 		canvas.drawBitmap(velocidade, null, Velocidade, paint);
+		canvas.drawBitmap(itemEsp, null, ItemEsp, paint);
+		canvas.drawBitmap(massa, null, Massa, paint);
 
 		ConcurrentHashMap<String, Jogador> jogadores = tratadorDeDadosDoCliente
 				.getJogadores();
@@ -668,28 +770,27 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 			BarrinhaImpulso.left += jogador.getX();
 
-			Log.e("Vieew", ""+jogador.getX());
+			Log.e("Vieew", "" + jogador.getX());
 		}
 
 		canvas.drawRect(BarrinhaImpulso, paint);
 		canvas.drawRect(BarrinhaVelocidade, paint);
 		canvas.drawRect(BarrinhaMassa, paint);
-		canvas.drawBitmap(massa, null, Massa, paint);
 		canvas.drawRect(Massa, paint);
 		canvas.drawRect(corda, paint);
+		canvas.drawRect(ItemEsp, paint);
+		canvas.drawRect(Impulso, paint);
+		canvas.drawRect(Velocidade, paint);
+
 		paint.setTextSize(20);
+		paint.setTextSize(10);
 
 		canvas.drawText("forcaa" + Forca + "impulsooo" + Num_impulso, 50, 30,
 				paint);
-		canvas.drawRect(Impulso, paint);
-		canvas.drawRect(Velocidade, paint);
-		paint.setTextSize(10);
-
 		canvas.drawText("Impulso", BarrinhaImpulso.left + 55,
 				BarrinhaImpulso.bottom, paint);
 		canvas.drawText("Velocidade", BarrinhaVelocidade.left + 55,
 				BarrinhaVelocidade.bottom, paint);
-
 		canvas.drawText("Massa", BarrinhaMassa.left + 55, BarrinhaMassa.bottom,
 				paint);
 		// positionX=dadosDoCliente.se();
@@ -720,6 +821,31 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		// positionX=cliente.GetX();
 		// positionX=dadosDoCliente.getX();
 		// positionY= dadosDoCliente.getY();
+
+		if (CoolDown == true) {
+			if (coolDown != 0) {
+				counterIten--;
+				if (counterIten == 0) {
+					coolDown--;
+					counterIten = 1000;
+					Log.i("coolDown", "" + coolDown);
+				}
+			}
+		}
+		Log.i("coolDown", "" + coolDown);
+		if (coolDown == 0 && CoolDown == true) {
+			ok = true;
+		}
+
+		if (coolDown == 0 || ok == true) {
+			c = rnd.nextInt(3);
+			CoolDown = false;
+			ok = false;
+			// coolDown = 30;
+		} else {
+			c = -1;
+		}
+
 		if (period != 0) {
 			counter++;
 		}
@@ -737,7 +863,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 							BarrinhaImpulso.right = 50 + BarrinhaImpulso.left;
 
 						} else {
-							//BarrinhaImpulso.right += 3;
+							// BarrinhaImpulso.right += 3;
 							dadosDoCliente.setX(3);
 						}
 
@@ -751,7 +877,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 						} else {
 
-							//BarrinhaVelocidade.right += 3;
+							// BarrinhaVelocidade.right += 3;
 							dadosDoCliente.setX(3);
 						}
 					}
@@ -762,7 +888,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 							BarrinhaMassa.right = 50 + BarrinhaMassa.left;
 
 						} else {
-							//BarrinhaMassa.right += 3;
+							// BarrinhaMassa.right += 3;
 							dadosDoCliente.setX(3);
 						}
 					}
