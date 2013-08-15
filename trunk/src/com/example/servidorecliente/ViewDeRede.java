@@ -28,25 +28,17 @@ import com.example.servidorecliente.rede.Protocolo;
 
 public class ViewDeRede extends View implements Runnable, Killable {
 
-	// acho q é aqui q o jogo "acontece" -> acho q aqui q entrará o código das
-	// meninas.
-
-	// private Paint paint;
 	private long time = 1;
-
-	// meninas
+	
 	int q;
 	int r;
 	int p;
 	int t;
 	int a;
 	int b;
-	int c = -1;
 	int n = 0;
 
 	private int counter;
-	private int coolDown = 0;
-	private int counterIten = 1000;
 	private int period = 100;
 	private int current;
 	int Forca;
@@ -75,8 +67,9 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	ImageManager img;
 	Conexao cliente;
 	Jogador jogadoor;
+	CoolD coolD = new CoolD();
 	private ControleDeUsuariosCliente tratadorDeDadosDoCliente;
-	private DadosDoCliente dadosDoCliente;
+	public DadosDoCliente dadosDoCliente;
 
 	Bitmap imagem;
 	Bitmap impulso;
@@ -84,17 +77,13 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	Bitmap massa;
 	Bitmap itemEsp;
 
-	Boolean CoolDown = false;
 	Boolean impp = false;
 	Boolean possivel = false;
-	private boolean ok;
 	private boolean ativo = true;
 
 	String SegTouch;
 	String PriTouch;
 	private static final String TAG = "view-rede";
-
-	Random rnd = new Random();
 
 	private ConcurrentHashMap<String, Jogador> jogadores;
 	private Queue<MotionEvent> fila;
@@ -121,7 +110,6 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		cliente.write(Protocolo.PROTOCOL_ID + "," + meuJogador.getID() + ","
 				+ meuJogador.getX() + "," + meuJogador.getPatente());
 
-		// meninas
 		setFocusableInTouchMode(true);
 		setClickable(true);
 		setLongClickable(true);
@@ -200,6 +188,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 				Log.d("vamos", "" + q);
 
 				if (Impulso.contains(q, r)) {
+					Log.i(TAG, "Entrou no down do impulso ");
 					BotImpulso();
 
 					PriTouch = "Impulso";
@@ -209,6 +198,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 				}
 				if (Velocidade.contains(q, r)) {
+					Log.i(TAG, "Entrou no down da velocidade ");
 					BotVelocidade();
 					PriTouch = "Velocidade";
 
@@ -217,6 +207,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 				}
 				if (Massa.contains(q, r)) {
+					Log.i(TAG, "Entrou no down da massa ");
 					BotMassa();
 					PriTouch = "Massa";
 
@@ -225,11 +216,14 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 				}
 				if (ItemEsp.contains(q, r)) {
+					Log.i(TAG, "Entrou no down do item especial");
 					BotIten();
 					PriTouch = "ItemEsp";
 
 					PointF point = new PointF(event.getX(id), event.getY(id));
 					dedos.put(id, point);
+
+					// CoolD.CoolDown = true;
 
 				}
 
@@ -256,6 +250,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 				Log.d("vamos", "" + segTouchX + impp.booleanValue());
 				if (impp == false) {
 					if (Impulso.contains(segTouchX, segTouchY)) {
+						Log.i(TAG, "Entrou no down do impulso");
 						BotImpulso();
 						SegTouch = "Impulso";
 
@@ -284,6 +279,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 						dedos.put(id, point);
 					}
 					if (ItemEsp.contains(segTouchX, segTouchY)) {
+						Log.i(TAG, "Entrou no down");
 						BotIten();
 						SegTouch = "ItemEsp";
 
@@ -323,7 +319,6 @@ public class ViewDeRede extends View implements Runnable, Killable {
 						if (corda.contains(p, corda.centerY())) {
 
 							AplicarCorda();
-
 						}
 					}
 					if (impp) {
@@ -345,7 +340,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 								}
 								if (ItemEsp.contains(a, ItemEsp.centerY())) {
 									CalcularIten();
-									CoolDown = true;
+									Log.i(TAG, "Entrou na condicao");
 								}
 
 							} else {
@@ -504,6 +499,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 								|| Massa.contains(a, b)
 								|| ItemEsp.contains(a, b)) {
 							if (Impulso.contains(a, b)) {
+								Log.i(TAG, "Entrou no up do impulso ");
 								CalcularImpulso();
 							}
 							if (Velocidade.contains(a, b)) {
@@ -513,7 +509,13 @@ public class ViewDeRede extends View implements Runnable, Killable {
 								CalcularMassa();
 							}
 							if (ItemEsp.contains(a, b)) {
+								Log.i(TAG, "Entrou no up do item especial ");
+								CoolD.CoolDown = true;
+								CoolD.coolDownTime = 10;
+								Log.i(TAG, "Entrou1:" + CoolD.CoolDown);
+
 								CalcularIten();
+								Log.i(TAG, "Entrou2:" + CoolD.CoolDown);
 							}
 
 						} else {
@@ -556,7 +558,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 	}
 
-	private void AplicarCorda() {
+	private void AplicarCorda() 
+	{
 		// TODO Auto-generated method stub
 		if (PriTouch == "corda") {
 
@@ -565,7 +568,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 			PriTouch = SegTouch;
 			q = segTouchX;
 
-		} else {
+		} else 
+		{
 			if (SegTouch == "corda") {
 
 				aplicarForca((int) (p - segTouchX) / 3);
@@ -577,10 +581,10 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		dadosDoCliente.setX((int) (positionX + 10));
 	}
 
-	private void BotMassa() {
+	private void BotMassa()
+	{
 		impp = true;
 		current = period;
-
 	}
 
 	private void BotVelocidade() {
@@ -601,19 +605,6 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	}
 
 	private void aplicarForca(int i) {
-
-		// positionX+=i;
-
-		// dadosDoCliente.setY(5);
-		/*
-		 * if(cliente!=null){ //cliente.write(Protocolo.PROTOCOL_MOVE + "," +
-		 * cliente.getId() + ","+positionX+20+","+positionY);
-		 * dadosDoCliente.setX((int)positionX+30);
-		 * jogadoor=cliente.getJogador(); }
-		 * 
-		 * positionX=jogadoor.getX();
-		 */
-		// positionX =cliente.GetX();
 
 		positionX = Width;
 		if (Num_impulso == 30000) {
@@ -717,25 +708,27 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	}
 
 	private void CalcularIten() {
-
+		Log.i("TAG", "" + n);
+		
 		impp = false;
 
 		Log.i("partida", "" + n);
 
-		if (c == 0) {
+		if (CoolD.item_Selecionado == 0) 
+		{
 			Num_impulso = 10000;
-			CoolDown = true;
-			coolDown = 10;
+			CoolD.CoolDown = true;
+			CoolD.coolDownTime = 10;
 		}
-		if (c == 1) {
+		if (CoolD.item_Selecionado == 1) {
 			Num_impulso = 20000;
-			CoolDown = true;
-			coolDown = 10;
+			CoolD.CoolDown = true;
+			CoolD.coolDownTime = 10;
 		}
-		if (c == 2) {
+		if (CoolD.item_Selecionado == 2) {
 			Num_impulso = 30000;
-			CoolDown = true;
-			coolDown = 10;
+			CoolD.CoolDown = true;
+			CoolD.coolDownTime = 10;
 		}
 
 		if (PriTouch == "Velocidade") {
@@ -805,46 +798,17 @@ public class ViewDeRede extends View implements Runnable, Killable {
 				Log.e(MainActivity.TAG, "interrupcao do run()");
 			}
 			update();
+
 			postInvalidate();
 		}
 
 	}
 
-	private void update() {
-
-		// tratadorDeDadosDoCliente.execute(cliente, cliente + "," +
-		// dadosDoCliente.getX() + "," +dadosDoCliente.getY() +";");
-
-		// jogadores=tratadorDeDadosDoCliente.getJogadores();
-		// jogadoor=jogadores.get(cliente.getId());
-
-		// positionX=cliente.GetX();
-		// positionX=dadosDoCliente.getX();
-		// positionY= dadosDoCliente.getY();
-
-		if (CoolDown == true) {
-			if (coolDown != 0) {
-				counterIten--;
-				if (counterIten == 0) {
-					coolDown--;
-					counterIten = 1000;
-					Log.i("coolDown", "" + coolDown);
-				}
-			}
-		}
-		Log.i("coolDown", "" + coolDown);
-		if (coolDown == 0 && CoolDown == true) {
-			ok = true;
-		}
-
-		if (coolDown == 0 || ok == true) {
-			c = rnd.nextInt(3);
-			CoolDown = false;
-			ok = false;
-			// coolDown = 30;
-		} else {
-			c = -1;
-		}
+	private void update() 
+	{
+		coolD.update2();
+		
+		Log.i(TAG, "Num_Impulso" + Num_impulso);
 
 		if (period != 0) {
 			counter++;
@@ -854,6 +818,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 			period--;
 			counter = 0;
 			current += 1000;
+			
 			// if(impp){
 			if (current - counter >= 100) {
 
@@ -900,18 +865,6 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		processEventQueue();
 
 	}
-
-	/*
-	 * public boolean onTouchEvent(MotionEvent event) { int action =
-	 * event.getAction(); Log.i(TAG, "ontouch: " + action);
-	 * 
-	 * int id = event.getPointerId(event.getActionIndex());
-	 * dadosDoCliente.setX((int) event.getX(id)); dadosDoCliente.setY((int)
-	 * event.getY(id));
-	 * 
-	 * return super.onTouchEvent(event); }
-	 */
-
 	public void killMeSoftly() {
 		ativo = false;
 	}
