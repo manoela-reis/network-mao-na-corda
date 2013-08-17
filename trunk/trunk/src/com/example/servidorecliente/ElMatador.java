@@ -1,10 +1,13 @@
 package com.example.servidorecliente;
 
+import interfaces.Killable;
+
 import java.util.Stack;
 
+import activities.MainActivity;
 import android.util.Log;
 
-import com.example.servidorecliente.rede.Killable;public class ElMatador {
+public class ElMatador {
 
 	private static final String TAG = "elmatador";
 	private static ElMatador instance;

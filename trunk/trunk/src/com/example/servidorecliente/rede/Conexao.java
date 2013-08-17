@@ -1,4 +1,8 @@
-package com.example.servidorecliente;
+package com.example.servidorecliente.rede;
+
+import interfaces.Const;
+import interfaces.DepoisDeReceberDados;
+import interfaces.Killable;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,9 +14,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import android.util.Log;
 
+import com.example.servidorecliente.ElMatador;
 import com.example.servidorecliente.bean.Jogador;
-import com.example.servidorecliente.rede.DepoisDeReceberDados;
-import com.example.servidorecliente.rede.Killable;
 
 public class Conexao implements Runnable, Killable {
 

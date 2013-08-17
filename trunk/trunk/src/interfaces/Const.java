@@ -1,4 +1,4 @@
-package com.example.servidorecliente;
+package interfaces;
 
 public interface Const {
 

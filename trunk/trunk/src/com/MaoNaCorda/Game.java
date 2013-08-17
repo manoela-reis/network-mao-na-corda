@@ -4,6 +4,8 @@ import java.text.BreakIterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import managers.ImageManager;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

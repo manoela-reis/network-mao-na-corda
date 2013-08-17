@@ -1,4 +1,7 @@
-package com.example.servidorecliente;
+package activities;
+
+import interfaces.DepoisDeReceberDados;
+import interfaces.Killable;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -12,10 +15,15 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.MaoNaCorda.Game;
+import com.example.servidorecliente.ElMatador;
+import com.example.servidorecliente.R;
+import com.example.servidorecliente.ViewDeRede;
+import com.example.servidorecliente.R.id;
+import com.example.servidorecliente.R.layout;
+import com.example.servidorecliente.rede.Conexao;
 import com.example.servidorecliente.rede.ControleDeUsuariosCliente;
 import com.example.servidorecliente.rede.ControleDeUsuariosServidor;
-import com.example.servidorecliente.rede.DepoisDeReceberDados;
-import com.example.servidorecliente.rede.Killable;
+import com.example.servidorecliente.rede.GerenteDEConexao;
 import com.example.servidorecliente.util.DialogHelper;
 import com.example.servidorecliente.util.RedeUtil;
 import com.example.servidorecliente.util.ViewUtil;

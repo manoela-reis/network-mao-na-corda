@@ -1,4 +1,7 @@
-package com.example.servidorecliente;
+package com.example.servidorecliente.rede;
+
+import interfaces.DepoisDeReceberDados;
+import interfaces.Killable;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -7,8 +10,7 @@ import java.util.ArrayList;
 
 import android.util.Log;
 
-import com.example.servidorecliente.rede.DepoisDeReceberDados;
-import com.example.servidorecliente.rede.Killable;
+import com.example.servidorecliente.ElMatador;
 import com.example.servidorecliente.util.RedeUtil;
 
 public class GerenteDEConexao implements Runnable, Killable {
