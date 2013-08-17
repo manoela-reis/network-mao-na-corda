@@ -1,4 +1,4 @@
-package com.example.servidorecliente.rede;
+package interfaces;
 
 public interface Protocolo {
 

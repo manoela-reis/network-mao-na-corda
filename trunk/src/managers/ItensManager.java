@@ -1,4 +1,4 @@
-package com.example.servidorecliente;
+package managers;
 
 import java.util.ArrayList;
 
@@ -12,7 +12,7 @@ public class ItensManager {
 	private Rect Velocidade = new Rect();
 
 	public ArrayList<Rect> rectsItens = new ArrayList<Rect>();
-	String StatusRect;
+	public String StatusRect;
 	Boolean detectado = false;
 
 	// vitoria

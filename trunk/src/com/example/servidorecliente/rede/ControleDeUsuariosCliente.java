@@ -1,12 +1,14 @@
 package com.example.servidorecliente.rede;
 
+import interfaces.DepoisDeReceberDados;
+import interfaces.Protocolo;
+
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
+import activities.MainActivity;
 import android.util.Log;
 
-import com.example.servidorecliente.Conexao;
-import com.example.servidorecliente.MainActivity;
 import com.example.servidorecliente.bean.Jogador;
 
 public class ControleDeUsuariosCliente implements DepoisDeReceberDados {
