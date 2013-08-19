@@ -1,8 +1,6 @@
 package com.example.servidorecliente.rede;
 
 
-import interfaces.Const;
-import interfaces.DepoisDeReceberDados;
 import android.util.Log;
 
 public class TratadorDeRedeECO implements DepoisDeReceberDados {

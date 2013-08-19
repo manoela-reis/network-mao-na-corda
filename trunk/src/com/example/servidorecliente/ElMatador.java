@@ -1,10 +1,10 @@
 package com.example.servidorecliente;
 
-import interfaces.Killable;
 
 import java.util.Stack;
 
-import activities.MainActivity;
+import com.example.servidorecliente.rede.Killable;
+
 import android.util.Log;
 
 public class ElMatador {

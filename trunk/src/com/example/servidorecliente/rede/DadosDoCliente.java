@@ -1,11 +1,9 @@
 package com.example.servidorecliente.rede;
 
-import interfaces.Killable;
-import interfaces.Protocolo;
-import activities.MainActivity;
 import android.util.Log;
 
 import com.example.servidorecliente.ElMatador;
+import com.example.servidorecliente.MainActivity;
 
 public class DadosDoCliente implements Runnable, Killable {
 
