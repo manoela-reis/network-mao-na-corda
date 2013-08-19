@@ -1,9 +1,6 @@
 package com.example.servidorecliente.rede;
 
 
-import interfaces.Const;
-import interfaces.DepoisDeReceberDados;
-import interfaces.Protocolo;
 
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;

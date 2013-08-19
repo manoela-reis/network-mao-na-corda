@@ -1,7 +1,5 @@
 package com.example.servidorecliente;
 
-import interfaces.Killable;
-import interfaces.Protocolo;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,10 +7,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-import managers.ImageManager;
-import managers.ItensManager;
 
-import activities.MainActivity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -26,10 +21,13 @@ import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.MaoNaCorda.ImageManager;
 import com.example.servidorecliente.bean.Jogador;
 import com.example.servidorecliente.rede.Conexao;
 import com.example.servidorecliente.rede.ControleDeUsuariosCliente;
 import com.example.servidorecliente.rede.DadosDoCliente;
+import com.example.servidorecliente.rede.Killable;
+import com.example.servidorecliente.rede.Protocolo;
 
 public class ViewDeRede extends View implements Runnable, Killable {
 

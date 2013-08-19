@@ -1,7 +1,5 @@
 package com.example.servidorecliente.rede;
 
-import interfaces.DepoisDeReceberDados;
-import interfaces.Killable;
 
 import java.io.IOException;
 import java.net.ServerSocket;
