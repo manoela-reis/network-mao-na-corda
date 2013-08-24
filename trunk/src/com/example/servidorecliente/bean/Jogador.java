@@ -1,6 +1,6 @@
 package com.example.servidorecliente.bean;
 
-import com.example.servidorecliente.ViewDeRede;
+import com.example.servidorecliente.rede.ViewDeRede;
 
 public class Jogador {
 	private String identificador;

@@ -1,4 +1,4 @@
-package managers;
+package com.example.servidorecliente.rede;
 
 import java.util.ArrayList;
 

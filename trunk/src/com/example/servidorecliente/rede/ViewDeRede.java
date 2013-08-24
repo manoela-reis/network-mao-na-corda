@@ -1,4 +1,4 @@
-package com.example.servidorecliente;
+package com.example.servidorecliente.rede;
 
 
 import java.util.Iterator;
@@ -22,12 +22,10 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.MaoNaCorda.ImageManager;
+import com.example.servidorecliente.CoolD;
+import com.example.servidorecliente.ElMatador;
+import com.example.servidorecliente.MainActivity;
 import com.example.servidorecliente.bean.Jogador;
-import com.example.servidorecliente.rede.Conexao;
-import com.example.servidorecliente.rede.ControleDeUsuariosCliente;
-import com.example.servidorecliente.rede.DadosDoCliente;
-import com.example.servidorecliente.rede.Killable;
-import com.example.servidorecliente.rede.Protocolo;
 
 public class ViewDeRede extends View implements Runnable, Killable {
 

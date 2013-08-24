@@ -1,4 +1,4 @@
-package activities;
+package com.example.servidorecliente;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.example.servidorecliente.ElMatador;
 import com.example.servidorecliente.R;
 import com.example.servidorecliente.R.layout;
 import com.example.servidorecliente.bean.Jogador;
