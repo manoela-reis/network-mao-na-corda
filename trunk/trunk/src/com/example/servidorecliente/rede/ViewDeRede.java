@@ -1,12 +1,10 @@
 package com.example.servidorecliente.rede;
 
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -27,7 +25,8 @@ import com.example.servidorecliente.ElMatador;
 import com.example.servidorecliente.MainActivity;
 import com.example.servidorecliente.bean.Jogador;
 
-public class ViewDeRede extends View implements Runnable, Killable {
+public class ViewDeRede extends View implements Runnable, Killable,
+		ItensAplicaveis {
 
 	// meninas.
 
@@ -42,7 +41,9 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 	private boolean ativo = true;
 	Jogador jogadoor;
+	private String nick;
 
+	Boolean Play1;
 	// meninas
 	int q;
 	int r;
@@ -54,9 +55,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 	Boolean possivel = false;
 	static Rect atual = new Rect();
 	static Rect corda = new Rect();
-	static Rect BarrinhaImpulso = new Rect();
-	static Rect BarrinhaVelocidade = new Rect();
-	static Rect BarrinhaMassa = new Rect();
+	static Rect[] Barrinhas = new Rect[3];
+
 	private int counter;
 	private int period = 100;
 	private int current;
@@ -108,6 +108,12 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		cliente.write(Protocolo.PROTOCOL_ID + "," + meuJogador.getID() + ","
 				+ meuJogador.getX() + "," + meuJogador.getPatente());
 
+		nick = meuJogador.getID();
+		if (nick == "Player 1") {
+			Play1 = true;
+		} else {
+			Play1 = false;
+		}
 		// meninas
 		setFocusableInTouchMode(true);
 		setClickable(true);
@@ -133,27 +139,30 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 		int larguraItem = (int) getWidth() / 10;
 		int alturaItem = (int) getHeight() / 10;
-		intensManager.CreateItens(larguraItem, alturaItem);
+
+		intensManager.CreateItens(larguraItem, alturaItem, Play1);
 
 		int larguraBarra = (int) getWidth() / 15;
 		int alturaBarra = (int) getHeight() / 15;
-		CreateBarrinhas(larguraBarra, alturaBarra);
+		createBarrinhas(larguraBarra, alturaBarra);
 
 		Width = getWidth() / 2;
 		Height = getHeight() / 2;
-		positionX = Width;
 		positionY = Height;
+		positionX = Width;
+
 		// dadosDoCliente.setX((int)positionX);
 		// dadosDoCliente.setY((int)positionY);
 
 	}
 
-	public void CreateBarrinhas(int larguraBarra, int alturaBarra) {
-		BarrinhaImpulso.set(larguraBarra, 2 * alturaBarra,
+	public void createBarrinhas(int larguraBarra, int alturaBarra) {
+
+		Barrinhas[0] = new Rect(larguraBarra, 2 * alturaBarra,
 				(int) (1.5f * larguraBarra), (int) (2.5f * alturaBarra));
-		BarrinhaVelocidade.set(larguraBarra, 3 * alturaBarra,
+		Barrinhas[1] = new Rect(larguraBarra, 3 * alturaBarra,
 				(int) (1.5f * larguraBarra), (int) (3.5f * alturaBarra));
-		BarrinhaMassa.set(larguraBarra, (4 * alturaBarra),
+		Barrinhas[2] = new Rect(larguraBarra, (4 * alturaBarra),
 				(int) (1.5f * larguraBarra), (int) (4.5f * alturaBarra));
 	}
 
@@ -322,20 +331,32 @@ public class ViewDeRede extends View implements Runnable, Killable {
 					PointF point = (PointF) dedos.get(id);
 					if (point != null) {
 						if ((int) point.x == q) {
-							if (possivel == true && q < event.getX(id)
-									&& PriTouch == "corda") {
-								if (corda.contains((int) event.getX(id),
-										(int) event.getY(id))) {
-									positionX = event.getX(id) - 10;
-								} else {
-									aplicarForca((int) ((event.getX(id) - q) / 3 * Num_impulso));
-									possivel = false;
-									dedos.remove(id);
+							if (possivel == true && PriTouch == "corda") {
+								if (Play1 && q < event.getX(id)) {
+									if (corda.contains((int) event.getX(id),
+											(int) event.getY(id))) {
+										positionX = event.getX(id) - 10;
+									} else {
+										aplicarForca((int) ((event.getX(id) - q) / 3 * Num_impulso));
+										possivel = false;
+										dedos.remove(id);
+									}
 								}
+								if (!Play1 && q > event.getX(id)) {
+									if (corda.contains((int) event.getX(id),
+											(int) event.getY(id))) {
+										positionX = event.getX(id) + 10;
+									} else {
+										aplicarForca((int) ((q - event.getX(id)) / 3 * Num_impulso));
+										possivel = false;
+										dedos.remove(id);
+									}
+								}
+
 							}
 						}
 						if ((int) point.x == segTouchX && SegTouch == "corda") {
-							if (segTouchX < event.getX(id)) {
+							if (Play1 && segTouchX < event.getX(id)) {
 								if (corda.contains((int) event.getX(id),
 										corda.centerY())) {
 									positionX = event.getX(id) - 10;
@@ -345,11 +366,20 @@ public class ViewDeRede extends View implements Runnable, Killable {
 									dedos.remove(id);
 								}
 
-							} else {
-								aplicarForca((int) ((event.getX(id) - q) / 3));
-								possivel = false;
-								dedos.remove(id);
 							}
+							if (!Play1 && segTouchX > event.getX(id)) {
+								if (corda.contains((int) event.getX(id),
+										corda.centerY())) {
+									positionX = event.getX(id) + 10;
+								} else {
+									aplicarForca((int) ((segTouchX - event
+											.getX(id)) / 3));
+									possivel = false;
+									dedos.remove(id);
+								}
+
+							}
+
 						}
 
 						if (impp) {
@@ -460,12 +490,12 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 	}
 
-	private void BotItemEsp() {
+	public void BotItemEsp() {
 		impp = true;
 		// current = period;
 	}
 
-	private void calcularItemEsp() {
+	public void calcularItemEsp() {
 
 		impp = false;
 
@@ -498,63 +528,63 @@ public class ViewDeRede extends View implements Runnable, Killable {
 
 	}
 
-	private void BotItem() {
+	public void BotItem() {
 		impp = true;
 		current = period;
 
 	}
 
-	private void aplicarForca(int i) {
+	public void aplicarForca(int i) {
 
 		positionX = Width;
+
 		if (Num_impulso == 30000) {
-			if (BarrinhaImpulso.right - BarrinhaImpulso.left >= 3) {
+			if (Barrinhas[0].right - Barrinhas[0].left >= 3) {
 				Forca = (int) (Forca * 1.3f);
-				BarrinhaImpulso.right += -3;
+				Barrinhas[0].right += -3;
 			} else {
 
 				Forca = (int) (Forca * 1.1f);
-				BarrinhaImpulso.right = BarrinhaImpulso.left;
+				Barrinhas[0].right = Barrinhas[0].left;
 			}
 
 		}
 		if (Num_impulso == 20000) {
-			if (BarrinhaVelocidade.right - BarrinhaVelocidade.left >= 3) {
+			if (Barrinhas[2].right - Barrinhas[2].left >= 3) {
 				Forca = (int) (Forca * 1.4f);
-				BarrinhaVelocidade.right += -3;
+				Barrinhas[2].right += -3;
 			} else {
 
 				Forca = (int) (Forca * 1.2f);
-				BarrinhaVelocidade.right = BarrinhaVelocidade.left;
+				Barrinhas[2].right = Barrinhas[2].left;
 				paint.setColor(Color.BLUE);
 			}
 
 		}
 		if (Num_impulso == 10000) {
-			if (BarrinhaMassa.right - BarrinhaMassa.left >= 3) {
+			if (Barrinhas[1].right - Barrinhas[1].left >= 3) {
 				Forca = (int) (Forca * 1.8f);
-				BarrinhaMassa.right += -3;
+				Barrinhas[1].right += -3;
 			} else {
 
 				Forca = (int) (Forca * 1.3f);
-				BarrinhaMassa.right = BarrinhaImpulso.left;
+				Barrinhas[1].right = Barrinhas[1].left;
 			}
 
 		}
 		Forca = i;
 		possivel = false;
-		// TODO Auto-generated method stub
 
 	}
 
-	private void calcularItens() {
+	public void calcularItens() {
 		impp = false;
 		dadosDoCliente.setX(0);
 
 		int larguraBarra = (int) getWidth() / 15;
 		int alturaBarra = (int) getHeight() / 15;
 
-		BarrinhaImpulso.set(larguraBarra, 2 * alturaBarra,
+		Barrinhas[0].set(larguraBarra, 2 * alturaBarra,
 				(int) (1.5f * larguraBarra), (int) (2.5f * alturaBarra));
 		if (current - counter <= 100) {
 			Num_impulso = 30000;
@@ -580,12 +610,18 @@ public class ViewDeRede extends View implements Runnable, Killable {
 			String keey = iterator.next();
 			Jogador jogadorLindu = jogadores.get(keey);
 
-			if (jogadorLindu.isVisible()) {
+			if (!jogadorLindu.isVisible()) {
 
 				atual.set(0, 0, (int) Width * 2, (int) Height * 2);
-				corda.set((int) positionX, (int) positionY,
-						(int) positionX + 200, (int) positionY + 100);
+				// PLAYER1
+				if (Play1) {
+					corda.set((int) positionX, (int) positionY,
+							(int) positionX + 200, (int) positionY + 100);
+				} else {
+					corda.set((int) positionX - 200, (int) positionY,
+							(int) positionX, (int) positionY + 100);
 
+				}
 				canvas.drawBitmap(imagem, null, atual, paint);
 				canvas.drawBitmap(velocidade, null,
 						intensManager.rectsItens.get(2), paint);
@@ -596,37 +632,38 @@ public class ViewDeRede extends View implements Runnable, Killable {
 					String key = iterato.next();
 					Jogador jogador = jogadores.get(key);
 
-					BarrinhaImpulso.left += jogador.getX();
+					Barrinhas[0].left += jogador.getX();
 
 					Log.e("Vieew", "" + jogador.getX());
 				}
 
-				canvas.drawRect(BarrinhaImpulso, paint);
-				canvas.drawRect(BarrinhaVelocidade, paint);
-				canvas.drawRect(BarrinhaMassa, paint);
+				for(int i =0;i<Barrinhas.length;i++){
+					canvas.drawRect(Barrinhas[i], paint);
+
+				}
+
 				canvas.drawBitmap(massa, null, intensManager.rectsItens.get(1),
 						paint);
-				canvas.drawRect(intensManager.rectsItens.get(1), paint);
 				canvas.drawBitmap(itemEsp, null,
 						intensManager.rectsItens.get(3), paint);
-				canvas.drawRect(intensManager.rectsItens.get(3), paint);
+				for(int i =0;i<intensManager.rectsItens.size();i++){
+					canvas.drawRect(intensManager.rectsItens.get(i), paint);
 
+				}
 				canvas.drawRect(corda, paint);
 				paint.setTextSize(20);
 
 				canvas.drawText("forcaa" + Forca + "impulsooo" + Num_impulso,
 						50, 30, paint);
-				canvas.drawRect(intensManager.rectsItens.get(0), paint);
-				canvas.drawRect(intensManager.rectsItens.get(2), paint);
 				paint.setTextSize(10);
 
-				canvas.drawText("Impulso", BarrinhaImpulso.left + 55,
-						BarrinhaImpulso.bottom, paint);
-				canvas.drawText("Velocidade", BarrinhaVelocidade.left + 55,
-						BarrinhaVelocidade.bottom, paint);
+				canvas.drawText("Impulso", Barrinhas[0].left + 55,
+						Barrinhas[0].bottom, paint);
+				canvas.drawText("Velocidade", Barrinhas[2].left + 55,
+						Barrinhas[2].bottom, paint);
 
-				canvas.drawText("Massa", BarrinhaMassa.left + 55,
-						BarrinhaMassa.bottom, paint);
+				canvas.drawText("Massa", Barrinhas[1].left + 55,
+						Barrinhas[1].bottom, paint);
 			}
 		}
 
@@ -651,7 +688,7 @@ public class ViewDeRede extends View implements Runnable, Killable {
 		if (period != 0) {
 			counter++;
 		}
-		coolD.update2();
+		coolD.updateCoolD();
 
 		if (counter == 1000) {
 			period--;
@@ -659,38 +696,8 @@ public class ViewDeRede extends View implements Runnable, Killable {
 			current += 1000;
 			if (current - counter >= 100) {
 
-				if (SegTouch == "Impulso" || PriTouch == "Impulso") {
-					if (BarrinhaImpulso.right - BarrinhaImpulso.left < 50) {
-						if (BarrinhaImpulso.right + 3 - BarrinhaImpulso.left > 50) {
-							BarrinhaImpulso.right = 50 + BarrinhaImpulso.left;
-
-						} else {
-							dadosDoCliente.setX(3);
-						}
-
-					}
-				}
-				if (SegTouch == "Velocidade" || PriTouch == "Velocidade") {
-					if (BarrinhaVelocidade.right - BarrinhaVelocidade.left < 50) {
-						if (BarrinhaVelocidade.right + 3
-								- BarrinhaVelocidade.left > 50) {
-							BarrinhaVelocidade.right = 50 + BarrinhaVelocidade.left;
-
-						} else {
-							dadosDoCliente.setX(3);
-						}
-					}
-				}
-				if (SegTouch == "Massa" || PriTouch == "Massa") {
-					if (BarrinhaMassa.right - BarrinhaMassa.left < 50) {
-						if (BarrinhaMassa.right + 3 - BarrinhaMassa.left > 50) {
-							BarrinhaMassa.right = 50 + BarrinhaMassa.left;
-
-						} else {
-							dadosDoCliente.setX(3);
-						}
-					}
-				}
+				intensManager.updateItensManager(SegTouch, PriTouch, Barrinhas, dadosDoCliente, 3);
+		
 			}
 
 		}
