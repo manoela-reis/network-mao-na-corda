@@ -1,22 +1,21 @@
-package activities;
+package com.example.servidorecliente;
 
-import interfaces.DepoisDeReceberDados;
-import interfaces.Killable;
-import interfaces.Protocolo;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import com.example.servidorecliente.ElMatador;
 import com.example.servidorecliente.R;
-import com.example.servidorecliente.ViewDeRede;
 import com.example.servidorecliente.R.id;
 import com.example.servidorecliente.R.layout;
 import com.example.servidorecliente.bean.Jogador;
 import com.example.servidorecliente.rede.Conexao;
 import com.example.servidorecliente.rede.ControleDeUsuariosCliente;
+import com.example.servidorecliente.rede.DepoisDeReceberDados;
 import com.example.servidorecliente.rede.GerenteDEConexao;
+import com.example.servidorecliente.rede.Killable;
+import com.example.servidorecliente.rede.Protocolo;
+import com.example.servidorecliente.rede.ViewDeRede;
 import com.example.servidorecliente.util.DialogHelper;
 import com.example.servidorecliente.util.ViewUtil;
 

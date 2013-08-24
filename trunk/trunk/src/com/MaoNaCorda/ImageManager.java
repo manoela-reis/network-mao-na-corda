@@ -1,4 +1,4 @@
-package managers;
+package com.MaoNaCorda;
 
 import java.io.IOException;
 import java.io.InputStream;

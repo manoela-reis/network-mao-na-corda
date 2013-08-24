@@ -1,6 +1,5 @@
-package interfaces;
+package com.example.servidorecliente.rede;
 
-import com.example.servidorecliente.rede.Conexao;
 
 
 public interface DepoisDeReceberDados {
