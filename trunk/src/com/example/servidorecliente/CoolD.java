@@ -18,12 +18,12 @@ public class CoolD {
 	public boolean ok = false;
 	public Random rnd = new Random();
 
-	public void update2() {
-		Log.i("coolDown", "Status:" + CoolDown);
-		Log.i("coolDown", "coolDownTime:" + coolDownTime);
-		Log.i("coolDown", "CounterIten:" + counterIten);
-		Log.i("coolDown", "AC:" + item_Selecionado);
-		Log.i("coolDown", "OK:" + ok);
+	public void updateCoolD() {
+//		Log.i("coolDown", "Status:" + CoolDown);
+//		Log.i("coolDown", "coolDownTime:" + coolDownTime);
+//		Log.i("coolDown", "CounterIten:" + counterIten);
+//		Log.i("coolDown", "AC:" + item_Selecionado);
+//		Log.i("coolDown", "OK:" + ok);
 		
 		if (CoolDown == true) {
 			Log.i("coolDown", "Cooldown é true!!!!");
