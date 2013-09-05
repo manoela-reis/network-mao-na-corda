@@ -164,6 +164,9 @@ public class ViewDeRede extends View implements Runnable, Killable,
 				(int) (1.5f * larguraBarra), (int) (3.5f * alturaBarra));
 		Barrinhas[2] = new Rect(larguraBarra, (4 * alturaBarra),
 				(int) (1.5f * larguraBarra), (int) (4.5f * alturaBarra));
+		dadosDoCliente.setImpX(Barrinhas[0].right);
+		dadosDoCliente.setMasX(Barrinhas[2].right);
+		dadosDoCliente.setVelX(Barrinhas[1].right);
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {
@@ -541,22 +544,26 @@ public class ViewDeRede extends View implements Runnable, Killable,
 		if (Num_impulso == 30000) {
 			if (Barrinhas[0].right - Barrinhas[0].left >= 3) {
 				Forca = (int) (Forca * 1.3f);
-				Barrinhas[0].right += -3;
+				dadosDoCliente.setImpX(Barrinhas[0].right-3);
+				dadosDoCliente.setX(atual.left+20);
 			} else {
 
 				Forca = (int) (Forca * 1.1f);
-				Barrinhas[0].right = Barrinhas[0].left;
+				dadosDoCliente.setImpX(Barrinhas[0].left);
+				dadosDoCliente.setX(atual.left+20);
 			}
 
 		}
 		if (Num_impulso == 20000) {
 			if (Barrinhas[2].right - Barrinhas[2].left >= 3) {
 				Forca = (int) (Forca * 1.4f);
-				Barrinhas[2].right += -3;
+				dadosDoCliente.setMasX(Barrinhas[2].right-3);
+				dadosDoCliente.setX(atual.left+20);
 			} else {
 
 				Forca = (int) (Forca * 1.2f);
-				Barrinhas[2].right = Barrinhas[2].left;
+				dadosDoCliente.setMasX(Barrinhas[2].left);
+				dadosDoCliente.setX(atual.left+20);
 				paint.setColor(Color.BLUE);
 			}
 
@@ -564,11 +571,15 @@ public class ViewDeRede extends View implements Runnable, Killable,
 		if (Num_impulso == 10000) {
 			if (Barrinhas[1].right - Barrinhas[1].left >= 3) {
 				Forca = (int) (Forca * 1.8f);
-				Barrinhas[1].right += -3;
+				dadosDoCliente.setX(atual.left+20);
+				dadosDoCliente.setVelX(Barrinhas[1].right-3);
+				
 			} else {
 
 				Forca = (int) (Forca * 1.3f);
-				Barrinhas[1].right = Barrinhas[1].left;
+				dadosDoCliente.setX(atual.left+20);
+				dadosDoCliente.setVelX(Barrinhas[1].left);
+				
 			}
 
 		}
@@ -625,17 +636,21 @@ public class ViewDeRede extends View implements Runnable, Killable,
 				canvas.drawBitmap(imagem, null, atual, paint);
 				canvas.drawBitmap(velocidade, null,
 						intensManager.rectsItens.get(2), paint);
-
+/*
 				Iterator<String> iterato = jogadores.keySet().iterator();
 
+				
 				while (iterato.hasNext()) {
-					String key = iterato.next();
-					Jogador jogador = jogadores.get(key);
+					String key = iterato.next();*/
+					Jogador jogador = jogadores.get(nick);
 
-					Barrinhas[0].left += jogador.getX();
+					Barrinhas[0].right = jogador.getImpX();
+					Barrinhas[2].right = jogador.getMasX();
+					Barrinhas[1].right=jogador.getVelX();
 
+					atual.left=jogador.getX();
 					Log.e("Vieew", "" + jogador.getX());
-				}
+				//}
 
 				for(int i =0;i<Barrinhas.length;i++){
 					canvas.drawRect(Barrinhas[i], paint);
