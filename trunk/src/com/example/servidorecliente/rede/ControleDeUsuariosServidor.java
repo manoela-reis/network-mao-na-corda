@@ -1,7 +1,5 @@
 package com.example.servidorecliente.rede;
 
-
-
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,7 +13,7 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 	// suportando acessos de multiplos threads
 	public static final String TAG = "controle";
 	public ConcurrentHashMap<String, Jogador> jogadores;
-//	private boolean conectou;
+	// private boolean conectou;
 	public static int count = 0;
 
 	public ControleDeUsuariosServidor() {
@@ -25,8 +23,8 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 	// comandos possiveis dos clientes
 	// ID,nome do usuario,x,y
 	// MOVE,x,y
-	public ConcurrentHashMap<String, Jogador> Jogadores (){
-		
+	public ConcurrentHashMap<String, Jogador> Jogadores() {
+
 		return jogadores;
 	}
 
@@ -42,10 +40,14 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 		if (linha.startsWith(Protocolo.PROTOCOL_MOVE)) {
 			moveUsuario(origem, linha);
 		}
-		
-		
-		
-		informaTodosUsuarios(origem, linha);
+
+		if (linha.startsWith(Protocolo.PROTOCOL_ITENS)) {
+			AttItens(origem, linha);
+		}
+
+		if (!linha.startsWith(Protocolo.PROTOCOL_ITENS)) {
+			informaTodosUsuarios(origem, linha);
+		}
 	}
 
 	private void informaTodosUsuarios(Conexao origem, String linha) {
@@ -54,46 +56,58 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 		while (iterator.hasNext()) {
 			String key = (String) iterator.next();
 			Jogador jogador = jogadores.get(key);
-			//jogador.update();
+			// jogador.update();
 			buffer.append(jogador.toStringCSV());
 		}
 
-		if(jogadores.get("Player 2")!=null)
-		{
-			origem.write(Protocolo.PROTOCOL_INICIAR +":"+ buffer.toString());
+		if (jogadores.get("Player 2") != null) {
+			origem.write(Protocolo.PROTOCOL_INICIAR + ":" + buffer.toString());
 
 		}
-		origem.write(Protocolo.PROTOCOL_MOVE +":"+ buffer.toString());
-		
-		//origem.write(linha);
+		origem.write(Protocolo.PROTOCOL_MOVE + ":" + buffer.toString());
+
+		// origem.write(linha);
 
 	}
-	
-	
 
-	
+	private void AttItens(Conexao origem, String linha) {
+		String[] array = linha.split(",");
+		int ImpX = Integer.parseInt(array[1]);
+		int MasX = Integer.parseInt(array[2]);
+		int VelX = Integer.parseInt(array[3]);
+
+		
+		Jogador jogador = jogadores.get(origem.getId());
+		jogador.setImpX(ImpX);
+		jogador.setMasX(MasX);
+		jogador.setVelX(VelX);
+		origem.write(Protocolo.PROTOCOL_ITENS +":"+ jogador.Itens());
+		//Jogador jogador = jogadores.get(origem.getId());
+		//jogador.setX(x);
+		//jogador.setY(y);
+	}
+
 	private void moveUsuario(Conexao origem, String linha) {
 		String[] array = linha.split(",");
 		int x = Integer.parseInt(array[1]);
 		int y = Integer.parseInt(array[2]);
 
-		
 		Jogador jogador = jogadores.get(origem.getId());
 		jogador.setX(x);
-		//Jogador jogador = jogadores.get(origem.getId());
-		//jogador.setX(x);
-		//jogador.setY(y);
+		// Jogador jogador = jogadores.get(origem.getId());
+		// jogador.setX(x);
+		// jogador.setY(y);
 	}
 
 	private void adicionaNovoUsuario(Conexao origem, String linha) {
 		String[] array = linha.split(",");
 		String nome = array[1];
 		int x = Integer.parseInt(array[2]);
-		String patente= array[3];
-		
+		String patente = array[3];
+
 		origem.setId(nome);
 		Jogador jogador = new Jogador(nome, x, patente);
 		jogadores.put(nome, jogador);
-		
+
 	}
 }

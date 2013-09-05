@@ -24,18 +24,18 @@ public class ItensManager {
 		rectsItens.add(Velocidade);
 		rectsItens.add(ItemEsp);
 
-		if(player1){
-			Impulso.set(larguraItem, 6 * alturaItem, (int) (2.1f * larguraItem),
-					(int) (7.5f * alturaItem));
+		if (player1) {
+			Impulso.set(larguraItem, 6 * alturaItem,
+					(int) (2.1f * larguraItem), (int) (7.5f * alturaItem));
 			Velocidade.set((int) (2.3f * larguraItem), 6 * alturaItem,
 					(int) (3.3f * larguraItem), (int) (7.5f * alturaItem));
 			Massa.set((int) (3.5f * larguraItem), 6 * alturaItem,
 					(int) (4.5f * larguraItem), (int) (7.5f * alturaItem));
 			ItemEsp.set((int) (6.5f * larguraItem), 2 * alturaItem,
 					(int) (7.8f * larguraItem), (int) (3 * alturaItem));
-		}else{
-			Impulso.set((int)(5.5*larguraItem), 6 * alturaItem, (int) (6.5f * larguraItem),
-					(int) (7.5 * alturaItem));
+		} else {
+			Impulso.set((int) (5.5 * larguraItem), 6 * alturaItem,
+					(int) (6.5f * larguraItem), (int) (7.5 * alturaItem));
 			Velocidade.set((int) (6.8 * larguraItem), 6 * alturaItem,
 					(int) (7.8 * larguraItem), (int) (7.5f * alturaItem));
 			Massa.set((int) (8 * larguraItem), 6 * alturaItem,
@@ -43,7 +43,7 @@ public class ItensManager {
 			ItemEsp.set((int) (6.5f * larguraItem), 2 * alturaItem,
 					(int) (7.8f * larguraItem), (int) (3 * alturaItem));
 		}
-	
+
 	}
 
 	public void detectar(int xPonto, int yPonto) {
@@ -78,45 +78,42 @@ public class ItensManager {
 
 	}
 
-	
 	public Boolean Detectado() {
 		return detectado;
 	}
 
 	public String ItemAtual() {
 		return StatusRect;
-	}	
-	
-	public void updateItensManager(String SegTouch, String PriTouch, Rect[]Barrinhas, DadosDoCliente dadosDoCliente, int numberSet) {
+	}
+
+
+	public void updateItensManager(String SegTouch, String PriTouch,
+			Rect[] Barrinhas, DadosDoCliente dadosDoCliente, int numberSet) {
 
 		if (SegTouch == "Impulso" || PriTouch == "Impulso") {
 			if (Barrinhas[0].right - Barrinhas[0].left < 50) {
 				if (Barrinhas[0].right + 3 - Barrinhas[0].left > 50) {
-					Barrinhas[0].right = 50 + Barrinhas[0].left;
-
+					
 				} else {
-					dadosDoCliente.setX(numberSet);
+					dadosDoCliente.setImpX(Barrinhas[0].right+numberSet);
 				}
 			}
 		}
 		if (SegTouch == "Velocidade" || PriTouch == "Velocidade") {
 			if (Barrinhas[1].right - Barrinhas[1].left < 50) {
-				if (Barrinhas[1].right + 3
-						- Barrinhas[1].left > 50) {
-					Barrinhas[1].right = 50 + Barrinhas[1].left;
+				if (Barrinhas[1].right + 3 - Barrinhas[1].left > 50) {
 
 				} else {
-					dadosDoCliente.setX(numberSet);
+					dadosDoCliente.setVelX(Barrinhas[1].right+numberSet);
 				}
 			}
 		}
 		if (SegTouch == "Massa" || PriTouch == "Massa") {
 			if (Barrinhas[2].right - Barrinhas[2].left < 50) {
 				if (Barrinhas[2].right + 3 - Barrinhas[2].left > 50) {
-					Barrinhas[2].right = 50 + Barrinhas[2].left;
 
 				} else {
-					dadosDoCliente.setX(numberSet);
+					dadosDoCliente.setMasX(Barrinhas[2].right+numberSet);
 				}
 			}
 		}

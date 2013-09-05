@@ -11,6 +11,9 @@ public class DadosDoCliente implements Runnable, Killable {
 	private int updateTime;
 
 	private int x;
+	private int ImpX;
+	private int VelX;
+	private int MasX;
 	private int y;
 	private boolean ativo = true;
 
@@ -28,7 +31,7 @@ public class DadosDoCliente implements Runnable, Killable {
 				Log.e(MainActivity.TAG, "interrupcao do run()");
 			}
 			cliente.write(Protocolo.PROTOCOL_MOVE + "," + x + "," + y);
-			
+			cliente.write(Protocolo.PROTOCOL_ITENS +","+ImpX+","+MasX+","+VelX );
 
 		}
 
@@ -40,7 +43,30 @@ public class DadosDoCliente implements Runnable, Killable {
 
 	public void setX(int x) {
 		this.x = x;
-		
+
+	}
+	public int getImpX() {
+		return ImpX;
+	}
+
+	public void setImpX(int x) {
+		this.ImpX = x;
+
+	}
+	public int getVelX() {
+		return VelX;
+	}
+
+	public void setVelX(int x) {
+		this.VelX = x;
+
+	}
+	public int getMasX() {
+		return MasX;
+	}
+
+	public void setMasX(int x) {
+		this.MasX = x;
 
 	}
 
