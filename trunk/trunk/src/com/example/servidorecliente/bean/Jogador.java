@@ -9,6 +9,10 @@ public class Jogador {
 	private int itemEspecial;
 	private Boolean Visible = false;
 
+	private int ImpX = 20;
+	private int VelX = 20;
+	private int MasX = 20;
+
 	public Jogador(String id, int x, String patente) {
 		this.identificador = id;
 		this.x = x;
@@ -34,9 +38,11 @@ public class Jogador {
 	public int getX() {
 		return x;
 	}
-	public void iniciarPartida(){
+
+	public void iniciarPartida() {
 		this.Visible = true;
 	}
+
 	public void setX(int x) {
 		this.x = x;
 
@@ -62,4 +68,34 @@ public class Jogador {
 		return identificador + "," + x + ";";
 	}
 
+	public String Itens() {
+		return identificador + "," + ImpX + "," + MasX + "," + VelX + ";";
+	}
+
+	public int getImpX() {
+		return ImpX;
+	}
+
+	public void setImpX(int x) {
+		this.ImpX = x;
+
+	}
+
+	public int getVelX() {
+		return VelX;
+	}
+
+	public void setVelX(int x) {
+		this.VelX = x;
+
+	}
+
+	public int getMasX() {
+		return MasX;
+	}
+
+	public void setMasX(int x) {
+		this.MasX = x;
+
+	}
 }
