@@ -19,7 +19,6 @@ public class ItensManager {
 	int altura;
 	int largura;
 
-	public void CreateItens(int larguraItem, int alturaItem, Boolean player1) {
 	public ItensManager(Boolean player1)
 	{
 		largura = ViewDeRede.larguraView;

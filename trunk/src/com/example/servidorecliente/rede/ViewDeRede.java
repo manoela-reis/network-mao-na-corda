@@ -3,7 +3,6 @@ package com.example.servidorecliente.rede;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android.content.Context;
@@ -94,6 +93,8 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 	public DadosDoCliente dadosDoCliente;
 
 	public static Resources res;
+	Rect atual = new Rect();
+	
 	
 	public ViewDeRede(Context context, Conexao cliente,
 			ControleDeUsuariosCliente tratadorDeDadosDoCliente) {
@@ -671,10 +672,8 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 								Iterator<String> iterato = jogadores.keySet().iterator();
 				
 				
-
-				
 				while (iterato.hasNext()) {
-					String key = iterato.next();*/
+					String key = iterato.next();
 					Jogador jogador = jogadores.get(nick);
 
 					Barrinhas[0].right = jogador.getImpX();
@@ -712,7 +711,7 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 				canvas.drawText("Massa", Barrinhas[1].left + 55,
 						Barrinhas[1].bottom, paint);
 			}
-		}
+		
 	}
 
 	public void run() {
