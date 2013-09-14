@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -19,74 +20,81 @@ import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.MaoNaCorda.BitmapManager;
 import com.MaoNaCorda.ImageManager;
 import com.example.servidorecliente.CoolD;
 import com.example.servidorecliente.ElMatador;
 import com.example.servidorecliente.MainActivity;
 import com.example.servidorecliente.bean.Jogador;
 
-public class ViewDeRede extends View implements Runnable, Killable,
-		ItensAplicaveis {
-
-	// meninas.
-
+public class ViewDeRede extends View implements Runnable, Killable, ItensAplicaveis
+{
 	private static final String TAG = "view-rede";
+	private String nick;	
+	String SegTouch;
+	String PriTouch;
+	
 	private static final int UPDATE_TIME = 100;
-	// private Paint paint;
 	private long time = 1;
 
-	private ConcurrentHashMap<String, Jogador> jogadores;
-	private ControleDeUsuariosCliente tratadorDeDadosDoCliente;
-	public DadosDoCliente dadosDoCliente;
-
 	private boolean ativo = true;
-	Jogador jogadoor;
-	private String nick;
-
+	Boolean possivel = false;
 	Boolean Play1;
-	// meninas
+	Boolean impp = false;
+	public static int larguraView;
+	public static int alturaView;
+	
 	int q;
 	int r;
 	int p;
 	int t;
 	int a;
 	int b;
-	Paint paint = new Paint();
-	Boolean possivel = false;
-	static Rect atual = new Rect();
-	static Rect corda = new Rect();
-	static Rect[] Barrinhas = new Rect[3];
-
+	int Forca;
+	int Num_impulso;
 	private int counter;
 	private int period = 100;
 	private int current;
+	private int segTouchX;
+	private int segTouchY;
+	int n = 0;
+
 	static float positionX = 40;
 	private static float positionY = 30;
 	private static float Width = 30;
 	private static float Height = 30;
+
+	static Rect rectFundo = new Rect();
+	static Rect corda = new Rect();
+	static Rect[] Barrinhas = new Rect[3];
+	Rect rectPatente;
+	Rect rectZ;
+	
+	
+	private Bitmap fundo;
+	private Bitmap impulso;
+	private Bitmap velocidade;
+	private Bitmap massa;
+	private Bitmap itemEsp;
+	private Bitmap patente;
+	private Bitmap Z;
+	
+	Jogador jogadoor;
+	Conexao cliente;
+	Paint paint = new Paint();
 	ImageManager img;
-	Bitmap imagem;
-	Bitmap impulso;
-	Bitmap velocidade;
-	Bitmap massa;
-	int Forca;
-	int Num_impulso;
-	Boolean impp = false;
-	private int segTouchX;
-	private int segTouchY;
-	String SegTouch;
-	String PriTouch;
+	ItensManager intensManager;
+	CoolD coolD = new CoolD();
+	BitmapManager bitmapManager;
+	
 	private Queue<MotionEvent> fila;
 	private SparseArray<PointF> dedos = new SparseArray<PointF>();
-	Conexao cliente;
-	ItensManager intensManager = new ItensManager();
-	// Vitoria
+	private ConcurrentHashMap<String, Jogador> jogadores;
+	private ControleDeUsuariosCliente tratadorDeDadosDoCliente;
+	public DadosDoCliente dadosDoCliente;
 
-	int n = 0;
-	CoolD coolD = new CoolD();
-
-	Bitmap itemEsp;
-
+	public static Resources res;
+	
 	public ViewDeRede(Context context, Conexao cliente,
 			ControleDeUsuariosCliente tratadorDeDadosDoCliente) {
 
@@ -104,33 +112,50 @@ public class ViewDeRede extends View implements Runnable, Killable,
 		// jogadoor=cliente.getJogador();
 
 		Jogador meuJogador = MainActivity.GetInstance().getPlayer();
+		
 		// primeira mensagem
 		cliente.write(Protocolo.PROTOCOL_ID + "," + meuJogador.getID() + ","
 				+ meuJogador.getX() + "," + meuJogador.getPatente());
 
 		nick = meuJogador.getID();
-		if (nick == "Player 1") {
+
+		if (nick == "Player 1") 
+		{
 			Play1 = true;
-		} else {
+		}
+		else 
+		{
 			Play1 = false;
 		}
-		// meninas
+		
 		setFocusableInTouchMode(true);
 		setClickable(true);
 		setLongClickable(true);
 		fila = new LinkedList<MotionEvent>();
 		paint.setColor(Color.BLACK);
-		img = new ImageManager((int) positionY * 2, (int) positionY * 2);
-		imagem = img.ImageManager("Game_Guerra.png", context);
-		impulso = img.ImageManager("amarelo.png", context);
-		velocidade = img.ImageManager("amarelo.png", context);
-		massa = img.ImageManager("amarelo.png", context);
+		
+		bitmapManager = new BitmapManager(context);
+		intensManager = new ItensManager(Play1);
 
-		// VITORIA
-		itemEsp = img.ImageManager("amarelo.png", context);
-
+		
 		Thread processo = new Thread(this);
 		processo.start();
+		
+		
+		res = getResources();
+
+		// Carregando Bitmpas.
+		fundo = BitmapManager.GetInstance().getImageFundo();
+		impulso = BitmapManager.GetInstance().getImageImpulso();
+		massa = BitmapManager.GetInstance().getImageMassa();
+		velocidade = BitmapManager.GetInstance().getImageVelocidade();
+		itemEsp = BitmapManager.GetInstance().getImageEnergitco();
+		patente = BitmapManager.GetInstance().getImagePatente();
+		Z = BitmapManager.GetInstance().getImageZ();
+		
+		// Carregando rects.
+		rectPatente = BitmapManager.GetInstance().getRectPatente();
+		rectZ = BitmapManager.GetInstance().getRectZ();
 
 	}
 
@@ -140,7 +165,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 		int larguraItem = (int) getWidth() / 10;
 		int alturaItem = (int) getHeight() / 10;
 
-		intensManager.CreateItens(larguraItem, alturaItem, Play1);
+	//	intensManager.CreateItens(larguraItem, alturaItem, Play1);
 
 		int larguraBarra = (int) getWidth() / 15;
 		int alturaBarra = (int) getHeight() / 15;
@@ -617,13 +642,17 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 		Iterator<String> iterator = jogadores.keySet().iterator();
 
+		larguraView = getWidth();
+		alturaView = getHeight();
+		
 		while (iterator.hasNext()) {
 			String keey = iterator.next();
 			Jogador jogadorLindu = jogadores.get(keey);
 
 			if (!jogadorLindu.isVisible()) {
 
-				atual.set(0, 0, (int) Width * 2, (int) Height * 2);
+				rectFundo.set(0, 0, getWidth(),getHeight());
+				
 				// PLAYER1
 				if (Play1) {
 					corda.set((int) positionX, (int) positionY,
@@ -633,11 +662,15 @@ public class ViewDeRede extends View implements Runnable, Killable,
 							(int) positionX, (int) positionY + 100);
 
 				}
-				canvas.drawBitmap(imagem, null, atual, paint);
-				canvas.drawBitmap(velocidade, null,
-						intensManager.rectsItens.get(2), paint);
-/*
-				Iterator<String> iterato = jogadores.keySet().iterator();
+				canvas.drawBitmap(massa, null, intensManager.rectsItens.get(1),paint);
+				canvas.drawBitmap(velocidade, null,intensManager.rectsItens.get(2), paint);
+				canvas.drawBitmap(itemEsp, null,intensManager.rectsItens.get(3), paint);
+				
+				canvas.drawBitmap(patente, null, rectPatente, paint);
+				canvas.drawBitmap(Z, null, rectZ, paint);
+								Iterator<String> iterato = jogadores.keySet().iterator();
+				
+				
 
 				
 				while (iterato.hasNext()) {
@@ -657,14 +690,13 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 				}
 
-				canvas.drawBitmap(massa, null, intensManager.rectsItens.get(1),
-						paint);
-				canvas.drawBitmap(itemEsp, null,
-						intensManager.rectsItens.get(3), paint);
-				for(int i =0;i<intensManager.rectsItens.size();i++){
-					canvas.drawRect(intensManager.rectsItens.get(i), paint);
 
+		
+		/*		for(int i =0;i<intensManager.rectsItens.size();i++){
+					canvas.drawRect(intensManager.rectsItens.get(i), paint);
 				}
+			*/	
+				
 				canvas.drawRect(corda, paint);
 				paint.setTextSize(20);
 
@@ -681,7 +713,6 @@ public class ViewDeRede extends View implements Runnable, Killable,
 						Barrinhas[1].bottom, paint);
 			}
 		}
-
 	}
 
 	public void run() {
@@ -703,7 +734,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 		if (period != 0) {
 			counter++;
 		}
-		coolD.updateCoolD();
+		coolD.update2();
 
 		if (counter == 1000) {
 			period--;
