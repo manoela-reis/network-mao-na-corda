@@ -563,8 +563,8 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 
 	}
 
-	public void aplicarForca(int i) {
-
+	public void aplicarForca(int i) 
+	{
 		positionX = Width;
 
 		if (Num_impulso == 30000) {
@@ -663,6 +663,9 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 							(int) positionX, (int) positionY + 100);
 
 				}
+				
+				canvas.drawBitmap(fundo, null, rectFundo, paint);
+				canvas.drawBitmap(impulso, null, intensManager.rectsItens.get(0), paint);								
 				canvas.drawBitmap(massa, null, intensManager.rectsItens.get(1),paint);
 				canvas.drawBitmap(velocidade, null,intensManager.rectsItens.get(2), paint);
 				canvas.drawBitmap(itemEsp, null,intensManager.rectsItens.get(3), paint);
@@ -682,7 +685,7 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 
 					atual.left=jogador.getX();
 					Log.e("Vieew", "" + jogador.getX());
-				//}
+				}
 
 				for(int i =0;i<Barrinhas.length;i++){
 					canvas.drawRect(Barrinhas[i], paint);
@@ -710,7 +713,8 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 
 				canvas.drawText("Massa", Barrinhas[1].left + 55,
 						Barrinhas[1].bottom, paint);
-			}
+				}
+		}
 		
 	}
 
@@ -733,7 +737,7 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 		if (period != 0) {
 			counter++;
 		}
-		coolD.update2();
+		coolD.updateCoolD();
 
 		if (counter == 1000) {
 			period--;

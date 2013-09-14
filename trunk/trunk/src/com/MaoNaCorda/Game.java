@@ -62,9 +62,9 @@ public class Game extends View implements Runnable
 		fila = new LinkedList<MotionEvent>();
 		paint.setColor(Color.BLACK);
 		paint.setTextSize(20);
-		img = new ImageManager((int) positionY * 2, (int) positionY * 2);
-		imagem = img.ImageManager("Game_Guerra.jpg", context);
-		impulso = img.ImageManager("amarelo.png", context);
+		//img = new ImageManager((int) positionY * 2, (int) positionY * 2);
+		//imagem = img.ImageManager("Game_Guerra.jpg", context);
+		//impulso = img.ImageManager("amarelo.png", context);
 
 		Thread processo = new Thread(this);
 		processo.start();

@@ -12,25 +12,30 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.View;
 
-public  class ImageManager  {
-
-	
-	Bitmap  geometric_figures;	
+public  class ImageManager 
+{
+	Bitmap geometric_figures;	
 	int positionX;
 	int positionY;
-	public ImageManager(int width, int heigth){
+	Context context;
+	
+	/*public ImageManager(int width, int heigth){
 		positionX=width;
 		positionY=heigth;
 		
-	}
-	public  Bitmap ImageManager(String name, Context context) 
+	}*/
+	
+    public ImageManager (Context context)
+    {
+    	this.context = context;
+    }
+	
+	public Bitmap ImageManager(String name) 
 	{
 		try 
 		{
-		InputStream img = context.getAssets().open(name);
-		
-		geometric_figures = BitmapFactory.decodeStream(img);
-		
+			InputStream img = context.getAssets().open(name);
+			geometric_figures = BitmapFactory.decodeStream(img);
 		}
 	catch (IOException e) 
 	{
