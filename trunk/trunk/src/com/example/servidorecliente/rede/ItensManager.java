@@ -32,7 +32,7 @@ public class ItensManager {
 		if(player1)
 		{
 			Impulso.set(largura/6, (int)(altura/1.4f), (int)(largura/3.5f),(int)(altura/1.04f));
-			Massa.set((int)(largura/3.30), (int)(altura/1.4f), (int)(largura/2.35f),(int)(altura/1.04f));
+			Massa.set((int)(largura/3.30), (int)(altura/1.4f), (int)(largura/2.4f),(int)(altura/1.04f));
 			Velocidade.set((int)(largura/2.28), (int)(altura/1.4f), (int)(largura/1.8f),(int)(altura/1.04f));
 			ItemEsp.set((int)(largura/1.75), (int)(altura/1.4f), (int)(largura/1.45f),(int)(altura/1.04f));
 			

@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,7 +47,9 @@ public class Servidor extends Activity implements Killable, Runnable
 	Thread thread;
 
 	DepoisDeReceberDados tratadorDeDadosDoCliente ;
-
+	private EditText editIP;
+	public static boolean conectou;
+	
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
@@ -55,16 +59,19 @@ public class Servidor extends Activity implements Killable, Runnable
 	
 		Log.i(TAG, "entrei no OnCreate servidor-cliente ");
 		
-		your_IP = (EditText) findViewById(R.id.yourIP);
-		aguardando = (EditText) findViewById(R.id.aguardando);
+//		your_IP = (EditText) findViewById(R.id.yourIP);
+//		aguardando = (EditText) findViewById(R.id.aguardando);
 		
 		setContentView(R.layout.servidor);
 		
 		 a = new ControleDeUsuariosServidor();
 		usuario="Player 1";
+	
 		MainActivity.GetInstance().getPlayer().setIdentificador(usuario);
-		 thread = new Thread(this);
-		 thread.start();
+		editIP = (EditText) findViewById(R.id.editText1);
+
+		thread = new Thread(this);
+		thread.start();
 		 
 		 ElMatador.getInstance().add(this);
 	}
@@ -132,6 +139,76 @@ public class Servidor extends Activity implements Killable, Runnable
 		System.out.print("run");
 
 	}
+	
+	
+	public void conectar(View sender) {
+		
+		usuario="Player 2";
+		MainActivity.GetInstance().getPlayer().setIdentificador(usuario);
+		editIP = (EditText) findViewById(R.id.editText1);
+		
+		Log.i(TAG, "entrei no conectar");
+		conectou = true;
+		String ip = editIP.getText().toString();
+
+		if (ip.trim().length() == 0) {
+			DialogHelper.message(this,
+					"endereco do servidor não pode ser vazio");
+
+		} else {
+			ViewUtil.closeKeyboard(this);
+		}
+
+			try {
+				DepoisDeReceberDados tratadorDeDadosDoCliente = new ControleDeUsuariosCliente();
+				
+				Socket s = new Socket(ip, PORTA_PADRAO);
+				conexao = new Conexao(s, usuario, tratadorDeDadosDoCliente);
+				Log.i(TAG, usuario + "XXXXXXXXXXXX");
+				
+				viewDoJogo = new ViewDeRede(this, conexao,
+					(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
+
+				setContentView(viewDoJogo);
+				// garante que view possa recuperar a lista de usuarios atual e
+				// enviar dados pela rede
+				
+				
+				Log.i(TAG, "Cliquei no conectar do cliente.");
+
+
+			} catch (UnknownHostException e) {
+				DialogHelper.error(this, "Erro ao conectar com o servidor",
+						MainActivity.TAG, e);
+
+			} catch (IOException e) {
+				DialogHelper.error(this, "Erro ao comunicar com o servidor",
+						MainActivity.TAG, e);
+			}
+
+		}
+
+	public void onBackPressed()
+	{
+		Log.i(TAG,"--------- back pressed");
+
+		new AlertDialog.Builder(this)
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.setTitle("abandonando o barco")
+				.setMessage(
+						"Tem certeza que vai embora ? vou sentir sua falta ...")
+				.setPositiveButton("Adeus",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								killMeSoftly();
+							}
+
+						}).setNegativeButton("Então tá, fico + um pouco", null)
+				.show();
+	}
+
+	
 	
 	public void killMeSoftly() {
 		ElMatador.getInstance().killThenAll();

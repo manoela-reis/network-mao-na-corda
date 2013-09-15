@@ -66,9 +66,10 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 	static Rect rectFundo = new Rect();
 	static Rect corda = new Rect();
 	static Rect[] Barrinhas = new Rect[3];
-	Rect rectPatente;
-	Rect rectZ;
 	
+	private Rect rectPatente;
+	private Rect rectZ;
+	private Rect rectDivisor;
 	
 	private Bitmap fundo;
 	private Bitmap impulso;
@@ -77,6 +78,7 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 	private Bitmap itemEsp;
 	private Bitmap patente;
 	private Bitmap Z;
+	private Bitmap divisor;
 	
 	Jogador jogadoor;
 	Conexao cliente;
@@ -153,11 +155,13 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 		itemEsp = BitmapManager.GetInstance().getImageEnergitco();
 		patente = BitmapManager.GetInstance().getImagePatente();
 		Z = BitmapManager.GetInstance().getImageZ();
+		divisor = BitmapManager.GetInstance().getImageDivisor();
 		
 		// Carregando rects.
 		rectPatente = BitmapManager.GetInstance().getRectPatente();
 		rectZ = BitmapManager.GetInstance().getRectZ();
-
+		rectDivisor = BitmapManager.GetInstance().getRectDivisor();
+		
 	}
 
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -650,7 +654,7 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 			String keey = iterator.next();
 			Jogador jogadorLindu = jogadores.get(keey);
 
-			if (!jogadorLindu.isVisible()) {
+			if (jogadorLindu.isVisible()) {
 
 				rectFundo.set(0, 0, getWidth(),getHeight());
 				
@@ -672,7 +676,11 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 				
 				canvas.drawBitmap(patente, null, rectPatente, paint);
 				canvas.drawBitmap(Z, null, rectZ, paint);
-								Iterator<String> iterato = jogadores.keySet().iterator();
+				canvas.drawBitmap(divisor, null, rectDivisor, paint);
+	
+				
+				
+				Iterator<String> iterato = jogadores.keySet().iterator();
 				
 				
 				while (iterato.hasNext()) {

@@ -35,6 +35,12 @@ public class BitmapManager{
 	private Bitmap divisor;
 	private Bitmap patente;
 	private Bitmap z;
+	private Bitmap fundoMenu;
+	private Bitmap opcaoNovoJogo;
+	private Bitmap opcaoInstrucoes;
+	private Bitmap opcaoCreditos;
+	private Bitmap fundoCreditos;
+	private Bitmap fundoInstrucoes;
 	
 	ImageManager img;
 	
@@ -43,9 +49,15 @@ public class BitmapManager{
 	
 	private Rect rectPatente = new Rect();
 	private Rect rectZ = new Rect();
+	private Rect rectDivisor = new Rect();
+	private Rect rectFundoMenu = new Rect();
+	private Rect rectFundoCreditos = new Rect();
+	private Rect rectFundoInstrucoes = new Rect();
+	private Rect rectOpcaoBatalha = new Rect();
+	private Rect rectOpcaoCreditos = new Rect();
+	private Rect rectOpcaoInstrucoes = new Rect();
 	
-	private Rect fundoRect;
-
+	
 	public BitmapManager(Context context)
 	{
 		altura = ViewDeRede.alturaView;
@@ -55,6 +67,7 @@ public class BitmapManager{
 		
 		img = new ImageManager(context);
 		
+		// Carregando as imagens da pasta assets
 		fundo = img.ImageManager("background.png");
 		massa = img.ImageManager("massa.png");
 		impulso = img.ImageManager("impulso.png");
@@ -63,18 +76,23 @@ public class BitmapManager{
 		divisor = img.ImageManager("parte_do_meio.png");
 		patente = img.ImageManager("patente.png");
 		z = img.ImageManager("z.png");
-	
-	
+		fundoMenu = img.ImageManager("menuprincipal_fundo.png");
+		opcaoNovoJogo = img.ImageManager("menuprincipal_Batalha.png");
+		opcaoInstrucoes = img.ImageManager("menuprincipal_Instrucoes.png");
+		opcaoCreditos = img.ImageManager("menuprincipal_Creditos.png");
+		fundoCreditos = img.ImageManager("creditos_quadro.png");
+		fundoInstrucoes = img.ImageManager("instrucoes_quadro.png");
 		
 		rectPatente.set((int)(largura/1.5f), altura/20, (int)(largura/1.02), altura/4);
 		rectZ.set(largura/30, altura/20, (int)(largura/5.7f), (int)(altura/3.4f));
-		
+		rectDivisor.set((int)(largura/2.15),(int)(altura/1.78),(int)(largura/1.7),(int)(altura/1.4f));		
 	}
 	
 	public static BitmapManager GetInstance(){
 		return Instance;
 	}
 	
+	// Bitmaps
 	public Bitmap getImageFundo(){
 		return fundo;
 	}
@@ -106,14 +124,46 @@ public class BitmapManager{
 	public Bitmap getImageZ(){
 		return z;
 	}
-		
+
+	public Bitmap getFundoMenu(){
+		return fundoMenu;
+	}
 	
+	public Bitmap getFundoInstrucoes(){
+		return fundoInstrucoes;
+	}
+
+	public Bitmap getFundoCreditos(){
+		return fundoCreditos;
+	}
+
+	public Bitmap getOpcaoBatalha()
+	{
+		return opcaoNovoJogo;
+	}
+
+	public Bitmap getOpcaoCreditos()
+	{
+		return opcaoCreditos;
+	}
+	
+	
+	public Bitmap getOpcaoInstrucoes()
+	{
+		return opcaoInstrucoes;
+	}
+	
+	// Rects
 	public Rect getRectPatente(){
 		return rectPatente;
 	}
 	
 	public Rect getRectZ(){
 		return rectZ;
+	}
+	
+	public Rect getRectDivisor(){
+		return rectDivisor;
 	}
 
 /*	
