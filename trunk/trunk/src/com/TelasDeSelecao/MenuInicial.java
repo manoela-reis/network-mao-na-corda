@@ -17,6 +17,7 @@ import com.example.servidorecliente.Servidor;
 
 public class MenuInicial extends View
 {
+	private Bitmap fundo;
 	private Bitmap background;
 	private Bitmap [] options;
 	private Rect [] areaOptions;
@@ -26,6 +27,7 @@ public class MenuInicial extends View
 	BitmapManager bitmaps;
 
 	private Rect rectFundo = new Rect();
+	private Rect rectBGMenu = new Rect();
 	
 	View creditos;
 	View instrucoes;
@@ -57,7 +59,7 @@ public class MenuInicial extends View
 		options[0] = BitmapManager.GetInstance().getOpcaoBatalha();
 		options[1] = BitmapManager.GetInstance().getOpcaoInstrucoes();
 		options[2] = BitmapManager.GetInstance().getOpcaoCreditos();
-	
+		fundo = BitmapManager.GetInstance().getImageFundo();
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -66,18 +68,17 @@ public class MenuInicial extends View
 		super.draw(canvas);
 
 		rectFundo.set(0,0,getWidth(),getHeight());
+		rectBGMenu.set(getWidth()/25,getHeight()/25,(int)(getWidth()/1.04f),(int)(getHeight()/1.1));
 		areaOptions[0].set((int)(getWidth()/2.4),(int)(getHeight()/2.6),getWidth(),(int)(getHeight()/1.83));
 		areaOptions[1].set((int)(getWidth()/3.34),(int)(getHeight()/1.69),(int)(getWidth()/1.13),(int)(getHeight()/1.33));
 		areaOptions[2].set((int)(getWidth()/5.4),(int)(getHeight()/1.26),(int)(getWidth()/1.3),(int)(getHeight()/1.05));
 
-		
-		
-		canvas.drawBitmap(background, null, rectFundo, paint);
+		canvas.drawBitmap(fundo, null, rectFundo, paint);
+		canvas.drawBitmap(background, null, rectBGMenu, paint);
 		canvas.drawBitmap(options[0],null, areaOptions[0], paint);
 		canvas.drawBitmap(options[1],null, areaOptions[1], paint);
 		canvas.drawBitmap(options[2],null, areaOptions[2], paint);
 		
-
 }
 	
 	public boolean onTouchEvent(MotionEvent event) 
@@ -102,7 +103,6 @@ public class MenuInicial extends View
 			{
 				Intent i = new Intent();				
 				activity.startActivity(i.setClass(getContext(), Servidor.class));
-				//creditos
 			}
 			
 			if (areaOptions[1].contains(a,b))
