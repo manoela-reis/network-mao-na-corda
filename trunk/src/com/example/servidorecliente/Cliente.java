@@ -44,8 +44,9 @@ public class Cliente extends Activity implements Killable, Runnable
 	private ViewDeRede viewDoJogo;
 	private Conexao conexao;
 	public static boolean conectou;
-public ControleDeUsuariosCliente tratadorDeDadosDoCliente;
-public int count;
+	public ControleDeUsuariosCliente tratadorDeDadosDoCliente;
+	public int count;
+	
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);

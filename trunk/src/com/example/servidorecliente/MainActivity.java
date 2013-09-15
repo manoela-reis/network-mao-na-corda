@@ -1,14 +1,11 @@
 package com.example.servidorecliente;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
-import com.example.servidorecliente.R;
-import com.example.servidorecliente.R.layout;
+import com.TelasDeSelecao.MenuInicial;
 import com.example.servidorecliente.bean.Jogador;
 
 public class MainActivity extends Activity 
@@ -17,18 +14,19 @@ public class MainActivity extends Activity
 	public static MainActivity Instance;
 
 	private Jogador meuPlayer;
-
+	private MenuInicial menu;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+	//	setContentView(R.layout.activity_main);
 		MainActivity Inst = this;
 		Instance = Inst;
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		
-
 		meuPlayer = new Jogador("", 100, "Aspirante");
+		menu = new MenuInicial(this);
+		setContentView(menu);
 	}
 
 	public static MainActivity GetInstance(){
@@ -43,7 +41,7 @@ public class MainActivity extends Activity
 	}
 	
 	
-	// Servidor/Cliente
+/*	// Servidor/Cliente
 	public void servidor(View sender)
 	{
 		Log.i(MainActivity.TAG, "Escolhi ser servidor/cliente!! ");
@@ -59,7 +57,7 @@ public class MainActivity extends Activity
 		Intent i = new Intent();
 		i.setClass(this,Cliente.class);
 		startActivity(i);		
-	}
+	}*/
 
 
 
