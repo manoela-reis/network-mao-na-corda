@@ -21,8 +21,8 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 	}
 
 	// comandos possiveis dos clientes
-	// ID,nome do usuario,x,y
-	// MOVE,x,y
+	// ID,nome do usuario,x
+	// MOVE,x
 	public ConcurrentHashMap<String, Jogador> Jogadores() {
 
 		return jogadores;
@@ -30,10 +30,10 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 
 	public void execute(Conexao origem, String linha) {
 
-		Log.i(Const.TAG, "<<" + linha);
+		//Log.i(Const.TAG, "<<" + linha);
 
 		if (linha.startsWith(Protocolo.PROTOCOL_ID)) {
-			Log.i(TAG, "Entreou no Protocolo ID");
+			//Log.i(TAG, "Entreou no Protocolo ID");
 			adicionaNovoUsuario(origem, linha);
 		}
 
@@ -41,13 +41,29 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 			moveUsuario(origem, linha);
 		}
 
+		if (linha.startsWith(Protocolo.PROTOCOL_FINALIZAR)) {
+			finalizarPartida(origem, linha);
+		}
 		if (linha.startsWith(Protocolo.PROTOCOL_ITENS)) {
 			AttItens(origem, linha);
 		}
+		if (linha.startsWith(Protocolo.PROTOCOL_ITEMESP)) {
+			AttItensEsp(origem, linha);
+		}
 
-		if (!linha.startsWith(Protocolo.PROTOCOL_ITENS)) {
+		if (!linha.startsWith(Protocolo.PROTOCOL_ITENS)
+				&& !linha.startsWith(Protocolo.PROTOCOL_ITEMESP)) {
 			informaTodosUsuarios(origem, linha);
 		}
+	}
+
+	private void finalizarPartida(Conexao origem, String Linha) {
+
+		Jogador jogador = jogadores.get(origem.getId());
+		jogador.ganhou();
+		jogador.finalizarPartida();
+		origem.write(Protocolo.PROTOCOL_FINALIZAR + ":" + origem.getId());
+
 	}
 
 	private void informaTodosUsuarios(Conexao origem, String linha) {
@@ -56,18 +72,42 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 		while (iterator.hasNext()) {
 			String key = (String) iterator.next();
 			Jogador jogador = jogadores.get(key);
-			// jogador.update();
 			buffer.append(jogador.toStringCSV());
+			if (jogador != null) {
+				if (!jogador.getVitoria()) {
+					if (jogadores.get("Player 2") != null) {
+
+						origem.write(Protocolo.PROTOCOL_INICIAR);
+						jogador.iniciarPartida();
+
+					}
+					origem.write(Protocolo.PROTOCOL_MOVE + ":"
+							+ buffer.toString());
+					if (origem.getId() != jogador.getID()) {
+						if (jogador.getItemEspecial() != 0) {
+
+							jogadores.get(origem.getId()).Acionar(
+									jogador.getItemEspecial());
+							origem.write(Protocolo.PROTOCOL_ACIONAR+":"
+									+ jogador.getItemEspecial());
+						}
+					}
+				} else {
+					finalizarPartida(origem, linha);
+				}
+			}
+
 		}
-
-		if (jogadores.get("Player 2") != null) {
-			origem.write(Protocolo.PROTOCOL_INICIAR + ":" + buffer.toString());
-
-		}
-		origem.write(Protocolo.PROTOCOL_MOVE + ":" + buffer.toString());
-
-		// origem.write(linha);
-
+		// Este método serve para atualizar o "Move", finalizar e iniciar...
+		// Há uma questão: se um dos jogadores finalizar a partida,o mesmo não
+		// mandava mais o "move".
+		// Mas, o outro continuava a atualizar sua movimentação, desta forma a
+		// solução foi testar
+		// se a vitoria está falsam, ou seja, se vc não ganhou, só assim ele
+		// mandará o move,
+		// bem como depois testará se o 2º cliente já se
+		// conectou(jogadores.get("Player 2")!= null),
+		// só assim ele inicia a partida, eliminando eros e ambiuidade
 	}
 
 	private void AttItens(Conexao origem, String linha) {
@@ -76,27 +116,37 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 		int MasX = Integer.parseInt(array[2]);
 		int VelX = Integer.parseInt(array[3]);
 
-		
 		Jogador jogador = jogadores.get(origem.getId());
 		jogador.setImpX(ImpX);
 		jogador.setMasX(MasX);
 		jogador.setVelX(VelX);
-		origem.write(Protocolo.PROTOCOL_ITENS +":"+ jogador.Itens());
-		//Jogador jogador = jogadores.get(origem.getId());
-		//jogador.setX(x);
-		//jogador.setY(y);
+		origem.write(Protocolo.PROTOCOL_ITENS + ":" + jogador.Itens());
+		// Jogador jogador = jogadores.get(origem.getId());
+		// jogador.setX(x);
+		// jogador.setY(y);
+	}
+
+	private void AttItensEsp(Conexao origem, String linha) {
+		String[] array = linha.split(",");
+		int itemEsp = Integer.parseInt(array[1]);
+
+		Jogador jogador = jogadores.get(origem.getId());
+		jogador.setItemEspecial(itemEsp);
+		origem.write(Protocolo.PROTOCOL_ITEMESP + ":"
+				+ jogador.getItemEspecial());
+		// Jogador jogador = jogadores.get(origem.getId());
+		// jogador.setX(x);
+		// jogador.setY(y);
 	}
 
 	private void moveUsuario(Conexao origem, String linha) {
 		String[] array = linha.split(",");
 		int x = Integer.parseInt(array[1]);
-		int y = Integer.parseInt(array[2]);
 
 		Jogador jogador = jogadores.get(origem.getId());
 		jogador.setX(x);
 		// Jogador jogador = jogadores.get(origem.getId());
 		// jogador.setX(x);
-		// jogador.setY(y);
 	}
 
 	private void adicionaNovoUsuario(Conexao origem, String linha) {

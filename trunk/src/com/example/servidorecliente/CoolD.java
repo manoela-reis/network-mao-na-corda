@@ -2,12 +2,14 @@ package com.example.servidorecliente;
 
 import java.util.Random;
 
+import com.example.servidorecliente.rede.DadosDoCliente;
+
 import android.util.Log;
 
 // Sumário - Itens
-// 0 - Dinamite
+// 0 - Energético
 // 1 - Casca de banana
-// 2 - Energético
+// 2 - Dinamite
 
 public class CoolD {
 
@@ -18,7 +20,7 @@ public class CoolD {
 	public boolean ok = false;
 	public Random rnd = new Random();
 
-	public void updateCoolD() {
+	public void updateCoolD(DadosDoCliente dadosdoCliente) {
 //		Log.i("coolDown", "Status:" + CoolDown);
 //		Log.i("coolDown", "coolDownTime:" + coolDownTime);
 //		Log.i("coolDown", "CounterIten:" + counterIten);
@@ -33,10 +35,15 @@ public class CoolD {
 				if (counterIten == 0) {
 					Log.i("coolDown", "aaa Cooldown diminuido");
 					coolDownTime--;
+					dadosdoCliente.setItemEsp(-1);
+
+
 					counterIten = 1000;
 				}
 			}
 		}
+
+		
 		// Log.i("coolDown", "" + coolDown);
 		if (coolDownTime == 0 && CoolDown == true) {
 			ok = true;
@@ -52,6 +59,8 @@ public class CoolD {
 			Log.i("coolDown", "entrou na 2º condicao");
 			CoolDown = false;
 			ok = false;
+			coolDownTime = -2;
+
 		} else {
 	//		item_Selecionado = -1;
 		}

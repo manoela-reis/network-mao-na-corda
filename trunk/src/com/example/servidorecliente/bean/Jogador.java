@@ -4,7 +4,7 @@ import com.example.servidorecliente.rede.ViewDeRede;
 
 public class Jogador {
 	private String identificador;
-	private int x;
+	private int x=-70;
 	private String patente;
 	private int itemEspecial;
 	private Boolean Visible = false;
@@ -12,6 +12,9 @@ public class Jogador {
 	private int ImpX = 20;
 	private int VelX = 20;
 	private int MasX = 20;
+	
+	private Boolean Vitoria = false;
+	private int ItemAcionado=-1;
 
 	public Jogador(String id, int x, String patente) {
 		this.identificador = id;
@@ -30,7 +33,10 @@ public class Jogador {
 	public Boolean isVisible() {
 		return Visible;
 	}
-
+	
+	public Boolean getVitoria() {
+		return Vitoria;
+	}
 	public void setIdentificador(String id) {
 		this.identificador = id;
 	}
@@ -41,6 +47,10 @@ public class Jogador {
 
 	public void iniciarPartida() {
 		this.Visible = true;
+	}
+	
+	public void finalizarPartida() {
+		this.Visible = false;
 	}
 
 	public void setX(int x) {
@@ -65,7 +75,8 @@ public class Jogador {
 	}
 
 	public String toStringCSV() {
-		return identificador + "," + x + ";";
+		return identificador + "," + x + "," + Vitoria + "," + itemEspecial
+				+ ";";
 	}
 
 	public String Itens() {
@@ -80,7 +91,9 @@ public class Jogador {
 		this.ImpX = x;
 
 	}
-
+	public void ganhou() {
+		Vitoria = true;
+	}
 	public int getVelX() {
 		return VelX;
 	}
@@ -96,6 +109,21 @@ public class Jogador {
 
 	public void setMasX(int x) {
 		this.MasX = x;
+
+	}
+	
+	public void Acionar(int Item) {
+		this.ItemAcionado=Item;
+
+	}
+	
+	public int getItemAcionado() {
+		 return ItemAcionado;
+
+	}
+
+	public void setVitoria(Boolean Vitoria) {
+		this.Vitoria = Vitoria;
 
 	}
 }
