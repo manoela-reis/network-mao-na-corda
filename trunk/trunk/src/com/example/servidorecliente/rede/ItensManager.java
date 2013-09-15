@@ -19,45 +19,50 @@ public class ItensManager {
 	int altura;
 	int largura;
 
-	public ItensManager(Boolean player1)
+	public ItensManager()
 	{
-		largura = ViewDeRede.larguraView;
-		altura = ViewDeRede.alturaView;
 		
 		rectsItens.add(Impulso);
 		rectsItens.add(Massa);
 		rectsItens.add(Velocidade);
 		rectsItens.add(ItemEsp);
 
-		if(player1)
-		{
-			Impulso.set(largura/6, (int)(altura/1.4f), (int)(largura/3.5f),(int)(altura/1.04f));
-			Massa.set((int)(largura/3.30), (int)(altura/1.4f), (int)(largura/2.4f),(int)(altura/1.04f));
-			Velocidade.set((int)(largura/2.28), (int)(altura/1.4f), (int)(largura/1.8f),(int)(altura/1.04f));
-			ItemEsp.set((int)(largura/1.75), (int)(altura/1.4f), (int)(largura/1.45f),(int)(altura/1.04f));
-			
-	/*
-			Velocidade.set((int) (2.3f * larguraItem), 6 * alturaItem,
-					(int) (3.3f * larguraItem), (int) (7.5f * alturaItem));
-			Massa.set((int) (3.5f * larguraItem), 6 * alturaItem,
-					(int) (4.5f * larguraItem), (int) (7.5f * alturaItem));
-			ItemEsp.set((int) (6.5f * larguraItem), 2 * alturaItem,
-					(int) (7.8f * larguraItem), (int) (3 * alturaItem));*/
-		}
-		else
-		{
-			Impulso.set((int)(largura/1.3f), (int)(altura/1.4f), (int)(largura/1.1f),(int)(altura/1.04f));
-	/*		Impulso.set((int)(5.5*larguraItem), 6 * alturaItem, (int) (6.5f * larguraItem),
-					(int) (7.5 * alturaItem));
-			Velocidade.set((int) (6.8 * larguraItem), 6 * alturaItem,
-					(int) (7.8 * larguraItem), (int) (7.5f * alturaItem));
-			Massa.set((int) (8 * larguraItem), 6 * alturaItem,
-					(int) (9 * larguraItem), (int) (7.5f * alturaItem));
-		*/	
-		}
+	
 	}
 	
+public void setDim(ViewDeRede view, Boolean player1){
+	largura = view.larguraView;
+	altura = view.alturaView;
+	if(player1)
+	{
+		Impulso.set(largura/6, (int)(altura/1.4f), (int)(largura/3.5f),(int)(altura/1.04f));
+		Massa.set((int)(largura/3.30), (int)(altura/1.4f), (int)(largura/2.4f),(int)(altura/1.04f));
+		Velocidade.set((int)(largura/2.28), (int)(altura/1.4f), (int)(largura/1.8f),(int)(altura/1.04f));
+		ItemEsp.set((int)(largura/1.75), (int)(altura/1.4f), (int)(largura/1.45f),(int)(altura/1.04f));
+		
+/*
+		Velocidade.set((int) (2.3f * larguraItem), 6 * alturaItem,
+				(int) (3.3f * larguraItem), (int) (7.5f * alturaItem));
+		Massa.set((int) (3.5f * larguraItem), 6 * alturaItem,
+				(int) (4.5f * larguraItem), (int) (7.5f * alturaItem));
+		ItemEsp.set((int) (6.5f * larguraItem), 2 * alturaItem,
+				(int) (7.8f * larguraItem), (int) (3 * alturaItem));*/
+	}
+	else
+	{
+		Impulso.set((int)(largura/1.3f), (int)(altura/1.4f), (int)(largura/1.1f),(int)(altura/1.04f));
+		Massa.set((int)(largura/1.6f), (int)(altura/1.4f), (int)(largura/1.4f),(int)(altura/1.04f));
 
+		/*		Impulso.set((int)(5.5*larguraItem), 6 * alturaItem, (int) (6.5f * larguraItem),
+				(int) (7.5 * alturaItem));
+		Velocidade.set((int) (6.8 * larguraItem), 6 * alturaItem,
+				(int) (7.8 * larguraItem), (int) (7.5f * alturaItem));
+		Massa.set((int) (8 * larguraItem), 6 * alturaItem,
+				(int) (9 * larguraItem), (int) (7.5f * alturaItem));
+	*/	
+	}
+	
+}
 	/*public void CreateItens(int larguraItem, int alturaItem, Boolean player1) {
 
 		rectsItens.add(Impulso);

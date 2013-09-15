@@ -50,18 +50,11 @@ public class BitmapManager{
 	private Rect rectPatente = new Rect();
 	private Rect rectZ = new Rect();
 	private Rect rectDivisor = new Rect();
-	private Rect rectFundoMenu = new Rect();
-	private Rect rectFundoCreditos = new Rect();
-	private Rect rectFundoInstrucoes = new Rect();
-	private Rect rectOpcaoBatalha = new Rect();
-	private Rect rectOpcaoCreditos = new Rect();
-	private Rect rectOpcaoInstrucoes = new Rect();
-	
-	
+	private Rect rectFundoJogo = new Rect();
+
 	public BitmapManager(Context context)
 	{
-		altura = ViewDeRede.alturaView;
-		largura = ViewDeRede.larguraView;
+		
 		
 		Instance = this;
 		
@@ -83,9 +76,15 @@ public class BitmapManager{
 		fundoCreditos = img.ImageManager("creditos_quadro.png");
 		fundoInstrucoes = img.ImageManager("instrucoes_quadro.png");
 		
+	
+	}
+	public void setRect(ViewDeRede view){
+		altura = view.alturaView;
+		largura = view.larguraView;
 		rectPatente.set((int)(largura/1.5f), altura/20, (int)(largura/1.02), altura/4);
 		rectZ.set(largura/30, altura/20, (int)(largura/5.7f), (int)(altura/3.4f));
-		rectDivisor.set((int)(largura/2.15),(int)(altura/1.78),(int)(largura/1.7),(int)(altura/1.4f));		
+		rectDivisor.set((int)(largura/2.15),(int)(altura/1.78),(int)(largura/1.7),(int)(altura/1.4f));	
+		rectFundoJogo.set(0,0,largura,altura);
 	}
 	
 	public static BitmapManager GetInstance(){
@@ -154,6 +153,10 @@ public class BitmapManager{
 	}
 	
 	// Rects
+	public Rect getRectFundo(){
+		return rectFundoJogo;
+	}
+	
 	public Rect getRectPatente(){
 		return rectPatente;
 	}
