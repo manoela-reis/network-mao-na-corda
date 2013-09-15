@@ -136,9 +136,9 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 		setLongClickable(true);
 		fila = new LinkedList<MotionEvent>();
 		paint.setColor(Color.BLACK);
-		
+
 		bitmapManager = new BitmapManager(context);
-		intensManager = new ItensManager(Play1);
+		intensManager = new ItensManager();
 
 		
 		Thread processo = new Thread(this);
@@ -147,20 +147,7 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 		
 		res = getResources();
 
-		// Carregando Bitmpas.
-		fundo = BitmapManager.GetInstance().getImageFundo();
-		impulso = BitmapManager.GetInstance().getImageImpulso();
-		massa = BitmapManager.GetInstance().getImageMassa();
-		velocidade = BitmapManager.GetInstance().getImageVelocidade();
-		itemEsp = BitmapManager.GetInstance().getImageEnergitco();
-		patente = BitmapManager.GetInstance().getImagePatente();
-		Z = BitmapManager.GetInstance().getImageZ();
-		divisor = BitmapManager.GetInstance().getImageDivisor();
 		
-		// Carregando rects.
-		rectPatente = BitmapManager.GetInstance().getRectPatente();
-		rectZ = BitmapManager.GetInstance().getRectZ();
-		rectDivisor = BitmapManager.GetInstance().getRectDivisor();
 		
 	}
 
@@ -171,15 +158,33 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 		int alturaItem = (int) getHeight() / 10;
 
 	//	intensManager.CreateItens(larguraItem, alturaItem, Play1);
-
+		larguraView = getWidth();
+		alturaView = getHeight();
 		int larguraBarra = (int) getWidth() / 15;
 		int alturaBarra = (int) getHeight() / 15;
 		createBarrinhas(larguraBarra, alturaBarra);
 
+		bitmapManager.setRect(this);
+		intensManager.setDim(this, Play1);
 		Width = getWidth() / 2;
 		Height = getHeight() / 2;
 		positionY = Height;
 		positionX = Width;
+		// Carregando Bitmpas.
+				fundo = BitmapManager.GetInstance().getImageFundo();
+				impulso = BitmapManager.GetInstance().getImageImpulso();
+				massa = BitmapManager.GetInstance().getImageMassa();
+				velocidade = BitmapManager.GetInstance().getImageVelocidade();
+				itemEsp = BitmapManager.GetInstance().getImageEnergitco();
+				patente = BitmapManager.GetInstance().getImagePatente();
+				Z = BitmapManager.GetInstance().getImageZ();
+				divisor = BitmapManager.GetInstance().getImageDivisor();
+				
+				// Carregando rects.
+				rectFundo = BitmapManager.GetInstance().getRectFundo();
+				rectPatente = BitmapManager.GetInstance().getRectPatente();
+				rectZ = BitmapManager.GetInstance().getRectZ();
+				rectDivisor = BitmapManager.GetInstance().getRectDivisor();
 
 		// dadosDoCliente.setX((int)positionX);
 		// dadosDoCliente.setY((int)positionY);
@@ -647,27 +652,29 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 
 		Iterator<String> iterator = jogadores.keySet().iterator();
 
-		larguraView = getWidth();
-		alturaView = getHeight();
+		
+		
+	//	rectFundo.set(0, 0, getWidth(),getHeight());
+
 		
 		while (iterator.hasNext()) {
 			String keey = iterator.next();
 			Jogador jogadorLindu = jogadores.get(keey);
-
+			
 			if (jogadorLindu.isVisible()) {
-
-				rectFundo.set(0, 0, getWidth(),getHeight());
 				
 				// PLAYER1
-				if (Play1) {
+				if (Play1) 
+				{
 					corda.set((int) positionX, (int) positionY,
 							(int) positionX + 200, (int) positionY + 100);
-				} else {
+				} else 
+				{
 					corda.set((int) positionX - 200, (int) positionY,
 							(int) positionX, (int) positionY + 100);
-
 				}
 				
+
 				canvas.drawBitmap(fundo, null, rectFundo, paint);
 				canvas.drawBitmap(impulso, null, intensManager.rectsItens.get(0), paint);								
 				canvas.drawBitmap(massa, null, intensManager.rectsItens.get(1),paint);
@@ -677,8 +684,6 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 				canvas.drawBitmap(patente, null, rectPatente, paint);
 				canvas.drawBitmap(Z, null, rectZ, paint);
 				canvas.drawBitmap(divisor, null, rectDivisor, paint);
-	
-				
 				
 				Iterator<String> iterato = jogadores.keySet().iterator();
 				
