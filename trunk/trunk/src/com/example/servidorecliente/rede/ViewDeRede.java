@@ -26,13 +26,13 @@ import com.example.servidorecliente.ElMatador;
 import com.example.servidorecliente.MainActivity;
 import com.example.servidorecliente.bean.Jogador;
 
-public class ViewDeRede extends View implements Runnable, Killable, ItensAplicaveis
-{
+public class ViewDeRede extends View implements Runnable, Killable,
+		ItensAplicaveis {
 	private static final String TAG = "view-rede";
-	private String nick;	
+	private String nick;
 	String SegTouch;
 	String PriTouch;
-	
+
 	private static final int UPDATE_TIME = 100;
 	private long time = 1;
 
@@ -42,7 +42,7 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 	Boolean impp = false;
 	public static int larguraView;
 	public static int alturaView;
-	
+
 	int q;
 	int r;
 	int p;
@@ -66,11 +66,11 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 	static Rect rectFundo = new Rect();
 	static Rect corda = new Rect();
 	static Rect[] Barrinhas = new Rect[3];
-	
+
 	private Rect rectPatente;
 	private Rect rectZ;
 	private Rect rectDivisor;
-	
+
 	private Bitmap fundo;
 	private Bitmap impulso;
 	private Bitmap velocidade;
@@ -79,15 +79,14 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 	private Bitmap patente;
 	private Bitmap Z;
 	private Bitmap divisor;
-	
-	Jogador jogadoor;
+
 	Conexao cliente;
 	Paint paint = new Paint();
 	ImageManager img;
 	ItensManager intensManager;
 	CoolD coolD = new CoolD();
 	BitmapManager bitmapManager;
-	
+
 	private Queue<MotionEvent> fila;
 	private SparseArray<PointF> dedos = new SparseArray<PointF>();
 	private ConcurrentHashMap<String, Jogador> jogadores;
@@ -96,8 +95,15 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 
 	public static Resources res;
 	Rect atual = new Rect();
-	
-	
+
+	Rect rectzinhoTeste;
+
+	int posicaoCorda = 0;
+
+	private int acionar = -1;
+
+	private int itemEspecial = -1;
+
 	public ViewDeRede(Context context, Conexao cliente,
 			ControleDeUsuariosCliente tratadorDeDadosDoCliente) {
 
@@ -112,25 +118,21 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 		dadosDoCliente = new DadosDoCliente(cliente, UPDATE_TIME);
 		Thread threadDados = new Thread(dadosDoCliente);
 		threadDados.start();
-		// jogadoor=cliente.getJogador();
 
 		Jogador meuJogador = MainActivity.GetInstance().getPlayer();
-		
+
 		// primeira mensagem
 		cliente.write(Protocolo.PROTOCOL_ID + "," + meuJogador.getID() + ","
 				+ meuJogador.getX() + "," + meuJogador.getPatente());
 
 		nick = meuJogador.getID();
 
-		if (nick == "Player 1") 
-		{
+		if (nick == "Player 1") {
 			Play1 = true;
-		}
-		else 
-		{
+		} else {
 			Play1 = false;
 		}
-		
+
 		setFocusableInTouchMode(true);
 		setClickable(true);
 		setLongClickable(true);
@@ -140,15 +142,11 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 		bitmapManager = new BitmapManager(context);
 		intensManager = new ItensManager();
 
-		
 		Thread processo = new Thread(this);
 		processo.start();
-		
-		
+
 		res = getResources();
 
-		
-		
 	}
 
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -157,7 +155,7 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 		int larguraItem = (int) getWidth() / 10;
 		int alturaItem = (int) getHeight() / 10;
 
-	//	intensManager.CreateItens(larguraItem, alturaItem, Play1);
+		// intensManager.CreateItens(larguraItem, alturaItem, Play1);
 		larguraView = getWidth();
 		alturaView = getHeight();
 		int larguraBarra = (int) getWidth() / 15;
@@ -170,21 +168,27 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 		Height = getHeight() / 2;
 		positionY = Height;
 		positionX = Width;
+
+		rectzinhoTeste = new Rect();
+		rectzinhoTeste.set((int) Width - getWidth() / 6, (int) Height
+				- getHeight() / 10, (int) Width + getWidth() / 6, (int) Height
+				+ getHeight() / 10);
+
 		// Carregando Bitmpas.
-				fundo = BitmapManager.GetInstance().getImageFundo();
-				impulso = BitmapManager.GetInstance().getImageImpulso();
-				massa = BitmapManager.GetInstance().getImageMassa();
-				velocidade = BitmapManager.GetInstance().getImageVelocidade();
-				itemEsp = BitmapManager.GetInstance().getImageEnergitco();
-				patente = BitmapManager.GetInstance().getImagePatente();
-				Z = BitmapManager.GetInstance().getImageZ();
-				divisor = BitmapManager.GetInstance().getImageDivisor();
-				
-				// Carregando rects.
-				rectFundo = BitmapManager.GetInstance().getRectFundo();
-				rectPatente = BitmapManager.GetInstance().getRectPatente();
-				rectZ = BitmapManager.GetInstance().getRectZ();
-				rectDivisor = BitmapManager.GetInstance().getRectDivisor();
+		fundo = BitmapManager.GetInstance().getImageFundo();
+		impulso = BitmapManager.GetInstance().getImageImpulso();
+		massa = BitmapManager.GetInstance().getImageMassa();
+		velocidade = BitmapManager.GetInstance().getImageVelocidade();
+		itemEsp = BitmapManager.GetInstance().getImageEnergitco();
+		patente = BitmapManager.GetInstance().getImagePatente();
+		Z = BitmapManager.GetInstance().getImageZ();
+		divisor = BitmapManager.GetInstance().getImageDivisor();
+
+		// Carregando rects.
+		rectFundo = BitmapManager.GetInstance().getRectFundo();
+		rectPatente = BitmapManager.GetInstance().getRectPatente();
+		rectZ = BitmapManager.GetInstance().getRectZ();
+		rectDivisor = BitmapManager.GetInstance().getRectDivisor();
 
 		// dadosDoCliente.setX((int)positionX);
 		// dadosDoCliente.setY((int)positionY);
@@ -537,32 +541,30 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 
 		impp = false;
 
-		Log.i("partida", "" + n);
+		// Log.i("partida", "" + n);
+		dadosDoCliente.setItemEsp(coolD.item_Selecionado);
 
 		if (CoolD.item_Selecionado == 0) {
 			Num_impulso = 10000;
 			CoolD.CoolDown = true;
-			CoolD.coolDownTime = 10;
-
+			CoolD.coolDownTime = 2;
 		}
 		if (CoolD.item_Selecionado == 1) {
 			Num_impulso = 20000;
 			CoolD.CoolDown = true;
-			CoolD.coolDownTime = 10;
-
+			CoolD.coolDownTime = 2;
 		}
 		if (CoolD.item_Selecionado == 2) {
 			Num_impulso = 30000;
 			CoolD.CoolDown = true;
-			CoolD.coolDownTime = 10;
-
+			CoolD.coolDownTime = 2;
 		}
 
-		if (PriTouch == "Velocidade") {
-			PriTouch = SegTouch;
-			SegTouch = "";
-			q = segTouchX;
-		}
+		// if (PriTouch == "Velocidade") {
+		// PriTouch = SegTouch;
+		// SegTouch = "";
+		// q = segTouchX;
+		// }
 
 	}
 
@@ -572,60 +574,59 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 
 	}
 
-	public void aplicarForca(int i) 
-	{
-		positionX = Width;
+	public void aplicarForca(int i) {
 
+		positionX = Width;
+		if (Play1) {
+			dadosDoCliente.setX(posicaoCorda + 1);
+		} else {
+			dadosDoCliente.setX(posicaoCorda - 1);
+		}
 		if (Num_impulso == 30000) {
 			if (Barrinhas[0].right - Barrinhas[0].left >= 3) {
 				Forca = (int) (Forca * 1.3f);
-				dadosDoCliente.setImpX(Barrinhas[0].right-3);
-				dadosDoCliente.setX(atual.left+20);
+				dadosDoCliente.setImpX(Barrinhas[0].right - 3);
 			} else {
 
 				Forca = (int) (Forca * 1.1f);
 				dadosDoCliente.setImpX(Barrinhas[0].left);
-				dadosDoCliente.setX(atual.left+20);
 			}
 
 		}
 		if (Num_impulso == 20000) {
 			if (Barrinhas[2].right - Barrinhas[2].left >= 3) {
 				Forca = (int) (Forca * 1.4f);
-				dadosDoCliente.setMasX(Barrinhas[2].right-3);
-				dadosDoCliente.setX(atual.left+20);
+				dadosDoCliente.setMasX(Barrinhas[2].right - 3);
 			} else {
 
 				Forca = (int) (Forca * 1.2f);
 				dadosDoCliente.setMasX(Barrinhas[2].left);
-				dadosDoCliente.setX(atual.left+20);
+				// dadosDoCliente.setX(atual.left + 20);
 				paint.setColor(Color.BLUE);
+
 			}
 
 		}
 		if (Num_impulso == 10000) {
 			if (Barrinhas[1].right - Barrinhas[1].left >= 3) {
 				Forca = (int) (Forca * 1.8f);
-				dadosDoCliente.setX(atual.left+20);
-				dadosDoCliente.setVelX(Barrinhas[1].right-3);
-				
+				dadosDoCliente.setVelX(Barrinhas[1].right - 3);
+
 			} else {
 
 				Forca = (int) (Forca * 1.3f);
-				dadosDoCliente.setX(atual.left+20);
 				dadosDoCliente.setVelX(Barrinhas[1].left);
-				
+
 			}
 
 		}
 		Forca = i;
 		possivel = false;
-
 	}
 
 	public void calcularItens() {
 		impp = false;
-		dadosDoCliente.setX(0);
+		dadosDoCliente.setX(-70);
 
 		int larguraBarra = (int) getWidth() / 15;
 		int alturaBarra = (int) getHeight() / 15;
@@ -652,67 +653,112 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 
 		Iterator<String> iterator = jogadores.keySet().iterator();
 
-		
-		
-	//	rectFundo.set(0, 0, getWidth(),getHeight());
+		// rectFundo.set(0, 0, getWidth(),getHeight());
 
-		
 		while (iterator.hasNext()) {
 			String keey = iterator.next();
 			Jogador jogadorLindu = jogadores.get(keey);
-			
+			if (jogadorLindu.getVitoria()) {
+				paint.setColor(Color.MAGENTA);
+				canvas.drawRect(0, 0, getWidth(), getHeight(), paint);// como se
+																		// fosse
+																		// a
+																		// tela
+																		// de
+																		// vitória(fim
+																		// de
+																		// jogo)
+			}
 			if (jogadorLindu.isVisible()) {
-				
+
+				if (jogadorLindu.getX() != posicaoCorda
+						&& jogadorLindu.getX() != -70) {
+					posicaoCorda = jogadorLindu.getX();
+					rectzinhoTeste.left = (20 + posicaoCorda) * getWidth() / 40
+							- getWidth() / 6;
+					rectzinhoTeste.right = (int) (rectzinhoTeste.left + 2 * getWidth() / 6);
+					dadosDoCliente.setX(-70);
+				}
+
 				// PLAYER1
-				if (Play1) 
-				{
+				if (Play1) {
 					corda.set((int) positionX, (int) positionY,
 							(int) positionX + 200, (int) positionY + 100);
-				} else 
-				{
+					if (posicaoCorda >= 20) {
+						dadosDoCliente.finalizar();
+					}
+				} else {
 					corda.set((int) positionX - 200, (int) positionY,
 							(int) positionX, (int) positionY + 100);
+					if (posicaoCorda <= -20) {
+						dadosDoCliente.finalizar();
+					}
+
 				}
-				
 
 				canvas.drawBitmap(fundo, null, rectFundo, paint);
-				canvas.drawBitmap(impulso, null, intensManager.rectsItens.get(0), paint);								
-				canvas.drawBitmap(massa, null, intensManager.rectsItens.get(1),paint);
-				canvas.drawBitmap(velocidade, null,intensManager.rectsItens.get(2), paint);
-				canvas.drawBitmap(itemEsp, null,intensManager.rectsItens.get(3), paint);
-				
+				canvas.drawBitmap(impulso, null,
+						intensManager.rectsItens.get(0), paint);
+				canvas.drawBitmap(massa, null, intensManager.rectsItens.get(1),
+						paint);
+				canvas.drawBitmap(velocidade, null,
+						intensManager.rectsItens.get(2), paint);
+				canvas.drawBitmap(itemEsp, null,
+						intensManager.rectsItens.get(3), paint);
+
 				canvas.drawBitmap(patente, null, rectPatente, paint);
 				canvas.drawBitmap(Z, null, rectZ, paint);
 				canvas.drawBitmap(divisor, null, rectDivisor, paint);
-				
+
 				Iterator<String> iterato = jogadores.keySet().iterator();
-				
-				
-				while (iterato.hasNext()) {
-					String key = iterato.next();
-					Jogador jogador = jogadores.get(nick);
 
-					Barrinhas[0].right = jogador.getImpX();
-					Barrinhas[2].right = jogador.getMasX();
-					Barrinhas[1].right=jogador.getVelX();
+				Jogador jogador = jogadores.get(nick);
 
-					atual.left=jogador.getX();
-					Log.e("Vieew", "" + jogador.getX());
-				}
+				Barrinhas[0].right = jogador.getImpX();
+				Barrinhas[2].right = jogador.getMasX();
+				Barrinhas[1].right = jogador.getVelX();
 
-				for(int i =0;i<Barrinhas.length;i++){
+				canvas.drawRect(rectzinhoTeste, paint);// desenha o rect de este
+														// de viória
+
+				for (int i = 0; i < Barrinhas.length; i++) {
 					canvas.drawRect(Barrinhas[i], paint);
 
 				}
 
+				if (itemEspecial < 0 && jogador.getItemEspecial() != -1) {
 
-		
-		/*		for(int i =0;i<intensManager.rectsItens.size();i++){
-					canvas.drawRect(intensManager.rectsItens.get(i), paint);
+					itemEspecial = jogador.getItemEspecial();
+					// Aqui vem o trecho em que trata o item especial , as
+					// modificacoes que ocorrerao no jogador
 				}
-			*/	
-				
+				if (acionar <= 0 && jogador.getItemAcionado() != -1) {
+
+					acionar = jogador.getItemAcionado();
+
+				}
+				if (itemEspecial >= 0 && jogador.getItemEspecial() < 0) {
+
+					itemEspecial = jogador.getItemEspecial();
+				}
+				if (acionar >= 0 && jogador.getItemAcionado() < 0) {
+
+					acionar = jogador.getItemAcionado();
+
+				}
+
+				/*
+				 * for(int i =0;i<intensManager.rectsItens.size();i++){
+				 * canvas.drawRect(intensManager.rectsItens.get(i), paint); }
+				 */
+
 				canvas.drawRect(corda, paint);
+				paint.setTextSize(20);
+
+				if (itemEspecial != -1 || acionar != -1) {
+					canvas.drawText("Item Esp" + itemEspecial + "Item Acio"
+							+ acionar, 50, 70, paint);
+				}
 				paint.setTextSize(20);
 
 				canvas.drawText("forcaa" + Forca + "impulsooo" + Num_impulso,
@@ -726,9 +772,9 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 
 				canvas.drawText("Massa", Barrinhas[1].left + 55,
 						Barrinhas[1].bottom, paint);
-				}
+			}
 		}
-		
+
 	}
 
 	public void run() {
@@ -750,7 +796,7 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 		if (period != 0) {
 			counter++;
 		}
-		coolD.updateCoolD();
+		coolD.updateCoolD(dadosDoCliente);
 
 		if (counter == 1000) {
 			period--;
@@ -758,8 +804,9 @@ public class ViewDeRede extends View implements Runnable, Killable, ItensAplicav
 			current += 1000;
 			if (current - counter >= 100) {
 
-				intensManager.updateItensManager(SegTouch, PriTouch, Barrinhas, dadosDoCliente, 3);
-		
+				intensManager.updateItensManager(SegTouch, PriTouch, Barrinhas,
+						dadosDoCliente, 3);
+
 			}
 
 		}

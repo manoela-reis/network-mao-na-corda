@@ -14,9 +14,11 @@ public class DadosDoCliente implements Runnable, Killable {
 	private int ImpX;
 	private int VelX;
 	private int MasX;
+	private int itemEspecial=-1;
 	private int y;
-	private boolean ativo = true;
-
+	private boolean ativo = true; 
+	private boolean finalizar=false;
+	
 	public DadosDoCliente(Conexao cliente, int updateTime) {
 		this.cliente = cliente;
 		this.updateTime = updateTime;
@@ -30,13 +32,22 @@ public class DadosDoCliente implements Runnable, Killable {
 			} catch (InterruptedException e) {
 				Log.e(MainActivity.TAG, "interrupcao do run()");
 			}
-			cliente.write(Protocolo.PROTOCOL_MOVE + "," + x + "," + y);
-			cliente.write(Protocolo.PROTOCOL_ITENS +","+ImpX+","+MasX+","+VelX );
+			if(!finalizar){
 
+			cliente.write(Protocolo.PROTOCOL_MOVE + "," + x + "," + y);
+			cliente.write(Protocolo.PROTOCOL_ITENS + "," + ImpX + "," + MasX
+					+ "," + VelX);
+			cliente.write(Protocolo.PROTOCOL_ITEMESP +"," +itemEspecial);
+			}else{
+				cliente.write(Protocolo.PROTOCOL_FINALIZAR );
+			}
 		}
 
 	}
 
+	public void finalizar(){
+		finalizar=true;
+	}
 	public int getX() {
 		return x;
 	}
@@ -47,6 +58,13 @@ public class DadosDoCliente implements Runnable, Killable {
 	}
 	public int getImpX() {
 		return ImpX;
+	}
+	public void setItemEsp(int itemEsp) {
+		this.itemEspecial = itemEsp;
+
+	}
+	public int getItemEsp() {
+		return itemEspecial;
 	}
 
 	public void setImpX(int x) {
