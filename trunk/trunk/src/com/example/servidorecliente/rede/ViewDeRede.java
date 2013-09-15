@@ -64,7 +64,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 	private static float Height = 30;
 
 	static Rect rectFundo = new Rect();
-	static Rect corda = new Rect();
+	static Rect maoPlayer = new Rect();
 	static Rect[] Barrinhas = new Rect[3];
 
 	private Rect rectPatente;
@@ -95,6 +95,17 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 	public static Resources res;
 	Rect atual = new Rect();
+	
+
+	//thyago
+	Sprite sprite;
+	Bitmap mao;
+	private Rect rectMao;	
+	//thyago
+	
+
+	public static long deltaTime;
+	public long lastTimeCount;
 
 	Rect rectzinhoTeste;
 
@@ -132,7 +143,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 		} else {
 			Play1 = false;
 		}
-
+		
 		setFocusableInTouchMode(true);
 		setClickable(true);
 		setLongClickable(true);
@@ -141,6 +152,12 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 		bitmapManager = new BitmapManager(context);
 		intensManager = new ItensManager();
+		img = new ImageManager(context);
+
+		
+		mao = img.ImageManager("tileset_maotileset_maoPlayer1.png");		
+		sprite = new Sprite(mao, 4, 1);
+	
 
 		Thread processo = new Thread(this);
 		processo.start();
@@ -240,7 +257,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 				}
 
 				if (!possivel) {
-					if (corda.contains(q, r)) {
+					if (maoPlayer.contains(q, r)) {
 						possivel = true;
 						impp = false;
 						PriTouch = "corda";
@@ -276,7 +293,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 				}
 
 				if (possivel == false) {
-					if (corda.contains(segTouchX, segTouchY)) {
+					if (maoPlayer.contains(segTouchX, segTouchY)) {
 						SegTouch = "corda";
 						possivel = true;
 					}
@@ -301,7 +318,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 					PointF point = (PointF) dedos.get(id);
 					if (possivel) {
 
-						if (corda.contains(p, t)) {
+						if (maoPlayer.contains(p, t)) {
 
 							if (PriTouch == "corda") {
 
@@ -375,7 +392,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 						if ((int) point.x == q) {
 							if (possivel == true && PriTouch == "corda") {
 								if (Play1 && q < event.getX(id)) {
-									if (corda.contains((int) event.getX(id),
+									if (maoPlayer.contains((int) event.getX(id),
 											(int) event.getY(id))) {
 										positionX = event.getX(id) - 10;
 									} else {
@@ -385,7 +402,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 									}
 								}
 								if (!Play1 && q > event.getX(id)) {
-									if (corda.contains((int) event.getX(id),
+									if (maoPlayer.contains((int) event.getX(id),
 											(int) event.getY(id))) {
 										positionX = event.getX(id) + 10;
 									} else {
@@ -399,8 +416,8 @@ public class ViewDeRede extends View implements Runnable, Killable,
 						}
 						if ((int) point.x == segTouchX && SegTouch == "corda") {
 							if (Play1 && segTouchX < event.getX(id)) {
-								if (corda.contains((int) event.getX(id),
-										corda.centerY())) {
+								if (maoPlayer.contains((int) event.getX(id),
+										maoPlayer.centerY())) {
 									positionX = event.getX(id) - 10;
 								} else {
 									aplicarForca((int) ((event.getX(id) - segTouchX) / 3));
@@ -410,8 +427,8 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 							}
 							if (!Play1 && segTouchX > event.getX(id)) {
-								if (corda.contains((int) event.getX(id),
-										corda.centerY())) {
+								if (maoPlayer.contains((int) event.getX(id),
+										maoPlayer.centerY())) {
 									positionX = event.getX(id) + 10;
 								} else {
 									aplicarForca((int) ((segTouchX - event
@@ -466,7 +483,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 				a = (int) event.getX(id);
 				b = (int) event.getY(id);
 				if (possivel) {
-					if (corda.contains(a, b)) {
+					if (maoPlayer.contains(a, b)) {
 
 						if (PriTouch == "corda") {
 
@@ -669,7 +686,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 																		// de
 																		// jogo)
 			}
-			if (jogadorLindu.isVisible()) {
+			if (!jogadorLindu.isVisible()) {
 
 				if (jogadorLindu.getX() != posicaoCorda
 						&& jogadorLindu.getX() != -70) {
@@ -682,13 +699,13 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 				// PLAYER1
 				if (Play1) {
-					corda.set((int) positionX, (int) positionY,
+					maoPlayer.set((int) positionX, (int) positionY,
 							(int) positionX + 200, (int) positionY + 100);
 					if (posicaoCorda >= 20) {
 						dadosDoCliente.finalizar();
 					}
 				} else {
-					corda.set((int) positionX - 200, (int) positionY,
+					maoPlayer.set((int) positionX - 200, (int) positionY,
 							(int) positionX, (int) positionY + 100);
 					if (posicaoCorda <= -20) {
 						dadosDoCliente.finalizar();
@@ -709,6 +726,8 @@ public class ViewDeRede extends View implements Runnable, Killable,
 				canvas.drawBitmap(patente, null, rectPatente, paint);
 				canvas.drawBitmap(Z, null, rectZ, paint);
 				canvas.drawBitmap(divisor, null, rectDivisor, paint);
+
+				sprite.Draw(canvas,maoPlayer);
 
 				Iterator<String> iterato = jogadores.keySet().iterator();
 
@@ -744,15 +763,8 @@ public class ViewDeRede extends View implements Runnable, Killable,
 				if (acionar >= 0 && jogador.getItemAcionado() < 0) {
 
 					acionar = jogador.getItemAcionado();
-
 				}
-
-				/*
-				 * for(int i =0;i<intensManager.rectsItens.size();i++){
-				 * canvas.drawRect(intensManager.rectsItens.get(i), paint); }
-				 */
-
-				canvas.drawRect(corda, paint);
+				
 				paint.setTextSize(20);
 
 				if (itemEspecial != -1 || acionar != -1) {
@@ -792,6 +804,11 @@ public class ViewDeRede extends View implements Runnable, Killable,
 	}
 
 	private void update() {
+				
+		this.deltaTime = System.currentTimeMillis() - this.lastTimeCount;
+		this.lastTimeCount = System.currentTimeMillis();		
+				
+		this.sprite.Update(this.deltaTime);
 
 		if (period != 0) {
 			counter++;
