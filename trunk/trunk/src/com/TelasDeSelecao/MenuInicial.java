@@ -31,7 +31,6 @@ public class MenuInicial extends View
 	
 	View creditos;
 	View instrucoes;
-
 	
 	public MenuInicial(Context context) 
 	{	
@@ -69,15 +68,15 @@ public class MenuInicial extends View
 
 		rectFundo.set(0,0,getWidth(),getHeight());
 		rectBGMenu.set(getWidth()/25,getHeight()/25,(int)(getWidth()/1.04f),(int)(getHeight()/1.1));
-		areaOptions[0].set((int)(getWidth()/2.4),(int)(getHeight()/2.6),getWidth(),(int)(getHeight()/1.83));
-		areaOptions[1].set((int)(getWidth()/3.34),(int)(getHeight()/1.69),(int)(getWidth()/1.13),(int)(getHeight()/1.33));
+		areaOptions[0].set((int)(getWidth()/2.4),(int)(getHeight()/2.66),(int)(getWidth()/1.04),(int)(getHeight()/1.9));
+		areaOptions[1].set((int)(getWidth()/2.4),(int)(getHeight()/1.83),(int)(getWidth()/1.04),(int)(getHeight()/1.45));
 		areaOptions[2].set((int)(getWidth()/5.4),(int)(getHeight()/1.26),(int)(getWidth()/1.3),(int)(getHeight()/1.05));
 
 		canvas.drawBitmap(fundo, null, rectFundo, paint);
 		canvas.drawBitmap(background, null, rectBGMenu, paint);
 		canvas.drawBitmap(options[0],null, areaOptions[0], paint);
 		canvas.drawBitmap(options[1],null, areaOptions[1], paint);
-		canvas.drawBitmap(options[2],null, areaOptions[2], paint);
+//		canvas.drawBitmap(options[2],null, areaOptions[2], paint);
 		
 }
 	

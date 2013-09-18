@@ -61,7 +61,7 @@ public class BitmapManager{
 		img = new ImageManager(context);
 		
 		// Carregando as imagens da pasta assets
-		fundo = img.ImageManager("background.png");
+		fundo = img.ImageManager("BG_Mao.png");
 		massa = img.ImageManager("massa.png");
 		impulso = img.ImageManager("impulso.png");
 		velocidade = img.ImageManager("velocidade.png");
