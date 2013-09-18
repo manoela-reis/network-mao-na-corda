@@ -4,5 +4,7 @@
     <string name="app_name">Mão na Corda</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_teste">Teste</string>
+    <string name="menu_settings">Settings</string>
 
 </resources>
