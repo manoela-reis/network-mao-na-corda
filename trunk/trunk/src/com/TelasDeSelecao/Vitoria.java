@@ -16,7 +16,7 @@ import com.MaoNaCorda.ImageManager;
 import com.example.servidorecliente.MainActivity;
 import com.example.servidorecliente.Servidor;
 
-public class Instrucoes extends View
+public class Vitoria extends View
 {
 	private Bitmap background;
 	private Bitmap instrucoes;
@@ -31,7 +31,7 @@ public class Instrucoes extends View
 	private Rect rectFundo = new Rect();
 	private Rect rectBGMenu = new Rect();
 	
-	public Instrucoes(Context context) 
+	public Vitoria(Context context) 
 	{	
 		super(context);
 		
