@@ -19,15 +19,17 @@ import com.example.servidorecliente.Servidor;
 public class Creditos extends View
 {
 	private Bitmap background;
+	private Bitmap creditos;
 	private Bitmap [] options;
 	private Rect voltar;
 	Paint paint;
 	View fase01;
 	Activity activity;
-	BitmapManager bitmaps;
+//	BitmapManager bitmaps;
 	ImageManager img;
 	
 	private Rect rectFundo = new Rect();
+	private Rect rectBGMenu = new Rect();
 	
 	public Creditos(Context context) 
 	{	
@@ -42,7 +44,8 @@ public class Creditos extends View
 		
 		img = new ImageManager(context);
 		
-		background = img.ImageManager("creditos_quadro.png");
+		background = img.ImageManager("BG_Mao.png");
+		creditos = img.ImageManager("creditos_quadro.png");
 
 		// TODO Auto-generated constructor stub
 	}
@@ -51,10 +54,11 @@ public class Creditos extends View
 	{
 		super.draw(canvas);
 
-		rectFundo.set(0,0,getWidth(),getHeight());		
+		rectFundo.set(0,0,getWidth(),getHeight());
+		rectBGMenu.set(getWidth()/25,getHeight()/25,(int)(getWidth()/1.04f),(int)(getHeight()/1.05));
 		
 		canvas.drawBitmap(background, null, rectFundo, paint);
-
+		canvas.drawBitmap(creditos, null, rectBGMenu, paint);
 }
 	
 	public boolean onTouchEvent(MotionEvent event) 
@@ -75,11 +79,11 @@ public class Creditos extends View
 			int a = (int)event.getX();
 			int b = (int)event.getY();
 
-			if(rectFundo.contains(a,b))
+/*			if(rectFundo.contains(a,b))
 			{
 				activity.finish();
 			}
-			
+	*/		
 			
 		}
 		
