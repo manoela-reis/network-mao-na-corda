@@ -14,6 +14,7 @@ import android.view.View;
 import com.MaoNaCorda.BitmapManager;
 import com.example.servidorecliente.MainActivity;
 import com.example.servidorecliente.Servidor;
+import com.example.servidorecliente.ActivityMenu;
 
 public class MenuInicial extends View
 {
@@ -106,16 +107,23 @@ public class MenuInicial extends View
 			if (areaOptions[1].contains(a,b))
 			{
 				Log.i(MainActivity.TAG, "Instrucoes");
-				instrucoes = new Instrucoes(activity);
+				ActivityMenu.name = "instrucoes";
+				Intent i = new Intent();				
+				activity.startActivity(i.setClass(getContext(), ActivityMenu.class));
+		/*		instrucoes = new Instrucoes(activity);
 				activity.setContentView(instrucoes);
+				*/
 			}
 			
 
 			if (areaOptions[2].contains(a,b))
 			{
+				ActivityMenu.name = "creditos";
 				Log.i(MainActivity.TAG, "Creditos");
-				creditos = new Creditos(activity);
-				activity.setContentView(creditos);
+			/*	creditos = new Creditos(activity);
+				activity.setContentView(creditos);*/
+				Intent i = new Intent();				
+				activity.startActivity(i.setClass(getContext(), ActivityMenu.class));
 			}
 			
 
