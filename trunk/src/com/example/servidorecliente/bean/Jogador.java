@@ -4,7 +4,10 @@ import com.example.servidorecliente.rede.ViewDeRede;
 
 public class Jogador {
 	private String identificador;
-	private int x=-70;
+	private int x = -70;
+	private float widthfull = 0;
+
+	private float posMao = 10;
 	private String patente;
 	private int itemEspecial;
 	private Boolean Visible = false;
@@ -12,9 +15,11 @@ public class Jogador {
 	private int ImpX = 20;
 	private int VelX = 20;
 	private int MasX = 20;
-	
+
 	private Boolean Vitoria = false;
-	private int ItemAcionado=-1;
+	private int ItemAcionado = -1;
+	private boolean Perdeu = false;
+	private boolean fechar = false;
 
 	public Jogador(String id, int x, String patente) {
 		this.identificador = id;
@@ -33,10 +38,12 @@ public class Jogador {
 	public Boolean isVisible() {
 		return Visible;
 	}
-	
+
 	public Boolean getVitoria() {
 		return Vitoria;
 	}
+
+
 	public void setIdentificador(String id) {
 		this.identificador = id;
 	}
@@ -48,13 +55,24 @@ public class Jogador {
 	public void iniciarPartida() {
 		this.Visible = true;
 	}
-	
+
 	public void finalizarPartida() {
 		this.Visible = false;
+
 	}
 
 	public void setX(int x) {
 		this.x = x;
+
+	}
+
+	public void setperdeu() {
+		this.Perdeu = true;
+
+	}
+
+	public Boolean Perdeu() {
+		return Perdeu;
 
 	}
 
@@ -76,7 +94,7 @@ public class Jogador {
 
 	public String toStringCSV() {
 		return identificador + "," + x + "," + Vitoria + "," + itemEspecial
-				+ ";";
+				+ "," + posMao + "," + ImpX + "," + widthfull + ";";
 	}
 
 	public String Itens() {
@@ -91,9 +109,20 @@ public class Jogador {
 		this.ImpX = x;
 
 	}
+
+	public float getWidthfull() {
+		return widthfull;
+	}
+
+	public void setWidthfull(float width) {
+		this.widthfull = width;
+
+	}
+
 	public void ganhou() {
 		Vitoria = true;
 	}
+
 	public int getVelX() {
 		return VelX;
 	}
@@ -111,15 +140,32 @@ public class Jogador {
 		this.MasX = x;
 
 	}
-	
-	public void Acionar(int Item) {
-		this.ItemAcionado=Item;
+
+	public float getPosMao() {
+		return posMao;
+	}
+
+	public void setPosMAo(float PosMao) {
+		this.posMao = PosMao;
 
 	}
-	
-	public int getItemAcionado() {
-		 return ItemAcionado;
 
+	public void Acionar(int Item) {
+		this.ItemAcionado = Item;
+
+	}
+
+	public int getItemAcionado() {
+		return ItemAcionado;
+
+	}
+
+	public void fechar() {
+		this.fechar = true;
+	}
+
+	public Boolean getFechar() {
+		return fechar;
 	}
 
 	public void setVitoria(Boolean Vitoria) {

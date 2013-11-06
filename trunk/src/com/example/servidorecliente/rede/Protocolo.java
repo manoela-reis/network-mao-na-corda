@@ -9,4 +9,6 @@ public interface Protocolo {
 	public static final String PROTOCOL_FINALIZAR = "FINALIZAR";
 	public static final String PROTOCOL_ITEMESP = "ITEM_ESPECIAL";
 	public static final String PROTOCOL_ACIONAR = "ACIONAR ITEM";
+	public static final String PROTOCOL_PERDEU = "PERDEU";
+	public static final String PROTOCOL_SAIU = "SAIU";
 }

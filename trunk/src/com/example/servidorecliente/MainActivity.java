@@ -3,8 +3,8 @@ package com.example.servidorecliente;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.view.View;
 
+import com.TelasDeSelecao.CopyOfMenuInicial;
 import com.TelasDeSelecao.MenuInicial;
 import com.example.servidorecliente.bean.Jogador;
 
@@ -20,7 +20,6 @@ public class MainActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-	//	setContentView(R.layout.activity_main);
 		MainActivity Inst = this;
 		Instance = Inst;
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);

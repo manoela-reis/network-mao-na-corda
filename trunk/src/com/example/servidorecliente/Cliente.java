@@ -81,10 +81,10 @@ public class Cliente extends Activity implements Killable, Runnable
 				conexao = new Conexao(s, usuario, tratadorDeDadosDoCliente);
 				Log.i(TAG, usuario + "XXXXXXXXXXXX");
 				
-				viewDoJogo = new ViewDeRede(this, conexao,
-					(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
+				//viewDoJogo = new ViewDeRede(this, conexao,
+				//	(ControleDeUsuariosCliente) tratadorDeDadosDoCliente);
 
-				setContentView(viewDoJogo);
+				//setContentView(viewDoJogo);
 				// garante que view possa recuperar a lista de usuarios atual e
 				// enviar dados pela rede
 				

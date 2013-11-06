@@ -65,14 +65,13 @@ public class Sprite {
 
 	public void iniciar(long deltaTime) {
 
-		
 		this.cronometro += deltaTime;
 
 		if (cronometro >= this.spriteTime + framePeriod) {
 			this.spriteTime = cronometro;
 			currentFrame--;
 			if (currentFrame <= 0) {
-				currentFrame=0;
+				currentFrame = 0;
 			}
 
 			this.selectRect.left = this.currentFrame * this.spriteWidth;
@@ -80,11 +79,10 @@ public class Sprite {
 			if (currentFrame <= 0) {
 				currentFrame = 1;
 
-
 				this.selectRect.left = this.currentFrame * this.spriteWidth;
 				this.selectRect.right = this.selectRect.left + this.spriteWidth;
-				status=false;
-				
+				status = false;
+
 			}
 		}
 
@@ -94,21 +92,19 @@ public class Sprite {
 
 		this.cronometro += deltaTime;
 
-		
 		if (cronometro >= this.spriteTime + framePeriod) {
 			this.spriteTime = cronometro;
 
 			currentFrame++;
-			if (currentFrame >= frameNr-1) {
+			if (currentFrame >= frameNr - 1) {
 
-				currentFrame=frameNr-1;
+				currentFrame = frameNr - 1;
 			}
-			
-			
+
 			this.selectRect.left = this.currentFrame * this.spriteWidth;
 			this.selectRect.right = this.selectRect.left + this.spriteWidth;
-			if (currentFrame >= frameNr-1) {
-				status=false;
+			if (currentFrame >= frameNr - 1) {
+				status = false;
 			}
 		}
 

@@ -30,10 +30,10 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 
 	public void execute(Conexao origem, String linha) {
 
-		//Log.i(Const.TAG, "<<" + linha);
+		// Log.i(Const.TAG, "<<" + linha);
 
 		if (linha.startsWith(Protocolo.PROTOCOL_ID)) {
-			//Log.i(TAG, "Entreou no Protocolo ID");
+			// Log.i(TAG, "Entreou no Protocolo ID");
 			adicionaNovoUsuario(origem, linha);
 		}
 
@@ -44,6 +44,10 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 		if (linha.startsWith(Protocolo.PROTOCOL_FINALIZAR)) {
 			finalizarPartida(origem, linha);
 		}
+
+		if (linha.startsWith(Protocolo.PROTOCOL_SAIU)) {
+			Sair(origem, linha);
+		}
 		if (linha.startsWith(Protocolo.PROTOCOL_ITENS)) {
 			AttItens(origem, linha);
 		}
@@ -52,7 +56,9 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 		}
 
 		if (!linha.startsWith(Protocolo.PROTOCOL_ITENS)
-				&& !linha.startsWith(Protocolo.PROTOCOL_ITEMESP)) {
+				&& !linha.startsWith(Protocolo.PROTOCOL_ITEMESP)
+				&& !linha.startsWith(Protocolo.PROTOCOL_SAIU)
+				&& !linha.startsWith(Protocolo.PROTOCOL_FINALIZAR)) {
 			informaTodosUsuarios(origem, linha);
 		}
 	}
@@ -62,7 +68,21 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 		Jogador jogador = jogadores.get(origem.getId());
 		jogador.ganhou();
 		jogador.finalizarPartida();
-		origem.write(Protocolo.PROTOCOL_FINALIZAR + ":" + origem.getId());
+		if (jogador.Perdeu()) {
+			origem.write(Protocolo.PROTOCOL_PERDEU + ":" + origem.getId());
+		} else {
+			origem.write(Protocolo.PROTOCOL_FINALIZAR + ":" + origem.getId());
+		}
+	}
+
+	private void Sair(Conexao origem, String Linha) {
+
+		Jogador jogador = jogadores.get(origem.getId());
+		jogador.fechar();
+		jogador.finalizarPartida();
+
+		origem.write(Protocolo.PROTOCOL_SAIU + ":" + origem.getId());
+		origem.killMeSoftly();
 
 	}
 
@@ -74,6 +94,12 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 			Jogador jogador = jogadores.get(key);
 			buffer.append(jogador.toStringCSV());
 			if (jogador != null) {
+				if (jogador.getFechar()) {
+					// if(jogador.getID()!=origem.getId()){
+					origem.write(Protocolo.PROTOCOL_SAIU + ":" + origem.getId());
+					origem.killMeSoftly();
+					// }
+				}
 				if (!jogador.getVitoria()) {
 					if (jogadores.get("Player 2") != null) {
 
@@ -88,11 +114,13 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 
 							jogadores.get(origem.getId()).Acionar(
 									jogador.getItemEspecial());
-							origem.write(Protocolo.PROTOCOL_ACIONAR+":"
+							origem.write(Protocolo.PROTOCOL_ACIONAR + ":"
 									+ jogador.getItemEspecial());
 						}
 					}
 				} else {
+					Jogador jog = jogadores.get(origem.getId());
+					jog.setperdeu();
 					finalizarPartida(origem, linha);
 				}
 			}
@@ -142,9 +170,16 @@ public class ControleDeUsuariosServidor implements DepoisDeReceberDados {
 	private void moveUsuario(Conexao origem, String linha) {
 		String[] array = linha.split(",");
 		int x = Integer.parseInt(array[1]);
+		float PosMao = Float.parseFloat(array[2]);
+		int impX = Integer.parseInt(array[3]);
+		float width = Float.parseFloat(array[4]);
 
 		Jogador jogador = jogadores.get(origem.getId());
 		jogador.setX(x);
+		jogador.setPosMAo(PosMao);
+		jogador.setImpX(impX);
+		jogador.setWidthfull(width);
+
 		// Jogador jogador = jogadores.get(origem.getId());
 		// jogador.setX(x);
 	}

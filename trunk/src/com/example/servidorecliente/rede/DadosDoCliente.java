@@ -11,14 +11,15 @@ public class DadosDoCliente implements Runnable, Killable {
 	private int updateTime;
 
 	private int x;
-	private int ImpX;
+	private int ImpX = 0;
 	private int VelX;
 	private int MasX;
-	private int itemEspecial=-1;
-	private int y;
-	private boolean ativo = true; 
-	private boolean finalizar=false;
-	
+	private int itemEspecial = -1;
+	private float PosMao;
+	private boolean ativo = true;
+	private boolean finalizar = false;
+	private float widthfull=0;
+
 	public DadosDoCliente(Conexao cliente, int updateTime) {
 		this.cliente = cliente;
 		this.updateTime = updateTime;
@@ -32,22 +33,25 @@ public class DadosDoCliente implements Runnable, Killable {
 			} catch (InterruptedException e) {
 				Log.e(MainActivity.TAG, "interrupcao do run()");
 			}
-			if(!finalizar){
+			if (!finalizar) {
 
-			cliente.write(Protocolo.PROTOCOL_MOVE + "," + x + "," + y);
-			cliente.write(Protocolo.PROTOCOL_ITENS + "," + ImpX + "," + MasX
-					+ "," + VelX);
-			cliente.write(Protocolo.PROTOCOL_ITEMESP +"," +itemEspecial);
-			}else{
-				cliente.write(Protocolo.PROTOCOL_FINALIZAR );
+				cliente.write(Protocolo.PROTOCOL_MOVE + "," + x + "," + PosMao
+						+ "," + ImpX +","+ widthfull);
+				// cliente.write(Protocolo.PROTOCOL_ITENS + "," + ImpX + "," +
+				// MasX
+				// + "," + VelX);
+				cliente.write(Protocolo.PROTOCOL_ITEMESP + "," + itemEspecial);
+			} else {
+				cliente.write(Protocolo.PROTOCOL_FINALIZAR);
 			}
 		}
 
 	}
 
-	public void finalizar(){
-		finalizar=true;
+	public void finalizar() {
+		finalizar = true;
 	}
+
 	public int getX() {
 		return x;
 	}
@@ -56,13 +60,16 @@ public class DadosDoCliente implements Runnable, Killable {
 		this.x = x;
 
 	}
+
 	public int getImpX() {
 		return ImpX;
 	}
+
 	public void setItemEsp(int itemEsp) {
 		this.itemEspecial = itemEsp;
 
 	}
+
 	public int getItemEsp() {
 		return itemEspecial;
 	}
@@ -71,6 +78,7 @@ public class DadosDoCliente implements Runnable, Killable {
 		this.ImpX = x;
 
 	}
+
 	public int getVelX() {
 		return VelX;
 	}
@@ -79,6 +87,7 @@ public class DadosDoCliente implements Runnable, Killable {
 		this.VelX = x;
 
 	}
+
 	public int getMasX() {
 		return MasX;
 	}
@@ -88,16 +97,23 @@ public class DadosDoCliente implements Runnable, Killable {
 
 	}
 
-	public int getY() {
-		return y;
+	public void setwidthFull(float width) {
+		this.widthfull = width;
+
 	}
 
-	public void setY(int y) {
-		this.y = y;
+	public float getPosMao() {
+		return PosMao;
+	}
+
+	public void setPosMao(float PosMao) {
+		this.PosMao = PosMao;
 	}
 
 	public void killMeSoftly() {
+		
 		ativo = false;
+		ElMatador.getInstance().killThenAll();
 	}
 
 }

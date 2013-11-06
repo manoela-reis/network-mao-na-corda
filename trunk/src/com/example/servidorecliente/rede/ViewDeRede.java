@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
+import android.R;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -18,13 +20,17 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.MaoNaCorda.BitmapManager;
 import com.MaoNaCorda.ImageManager;
 import com.example.servidorecliente.CoolD;
 import com.example.servidorecliente.ElMatador;
+import com.example.servidorecliente.EsperaServer;
 import com.example.servidorecliente.MainActivity;
 import com.example.servidorecliente.bean.Jogador;
+import com.example.servidorecliente.util.RedeUtil;
 
 public class ViewDeRede extends View implements Runnable, Killable,
 		ItensAplicaveis {
@@ -34,6 +40,7 @@ public class ViewDeRede extends View implements Runnable, Killable,
 	String PriTouch;
 
 	private static final int UPDATE_TIME = 100;
+	private Bitmap Serverfundo;
 	private long time = 1;
 
 	private boolean ativo = true;
@@ -72,10 +79,9 @@ public class ViewDeRede extends View implements Runnable, Killable,
 	private Rect rectDivisor;
 
 	private Bitmap fundo;
-	private Bitmap impulso;
-	private Bitmap velocidade;
-	private Bitmap massa;
-	private Bitmap itemEsp;
+	private Bitmap ImgCasca;
+	private Bitmap ImgTNT;
+	private Bitmap ImgEnergetico;
 	private Bitmap patente;
 	private Bitmap Z;
 	private Bitmap divisor;
@@ -95,19 +101,15 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 	public static Resources res;
 	Rect atual = new Rect();
-	
 
-	//thyago
+	// thyago
 	Sprite sprite;
 	Bitmap mao;
-	private Rect rectMao;	
-	//thyago
-	
+	private Rect rectMao;
+	// thyago
 
 	public static long deltaTime;
 	public long lastTimeCount;
-
-	Rect rectzinhoTeste;
 
 	int posicaoCorda = 0;
 
@@ -115,20 +117,58 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 	private int itemEspecial = -1;
 
-	public ViewDeRede(Context context, Conexao cliente,
+	private Rect Corda;
+	Bitmap ImgCorda;
+	private Rect CordaFull;
+	Bitmap ImgCordaF;
+
+	Bitmap ImgMaoRosa;
+
+	private int status = 0;
+	private boolean Energetico = false;
+	private boolean Casca = false;
+	private boolean TNT = false;
+	Bitmap barra;
+	private Rect maoPlayerAdv = new Rect();
+	private Bitmap maoAdv;
+	Sprite spriteMaoAdv;
+
+	private Rect CascaRect = new Rect();
+	private Bitmap ImgCasca1;
+	private Bitmap ImgCasca2;
+	Sprite spriteCasca1;
+	Sprite spriteCasca2;
+
+	private Bitmap ImgTNT1;
+	private Bitmap ImgTNT2;
+	Sprite spriteTNT1;
+	Sprite spriteTNT2;
+
+	public Boolean autorizado = true;
+	Activity espera;
+
+	private Rect rectMarcador;
+
+	private Bitmap marcador;
+	private Bitmap Vitoria;
+	private Bitmap Derrota;
+
+	public ViewDeRede(Activity context, Conexao cliente,
 			ControleDeUsuariosCliente tratadorDeDadosDoCliente) {
 
 		super(context);
 		ElMatador.getInstance().add(this);
 
+		// this.myview=view;
+		this.espera = (Activity) context;
 		this.tratadorDeDadosDoCliente = tratadorDeDadosDoCliente;
 		// this.tratadorDeDadosDoCliente.iniciarJogo();
 		this.cliente = cliente;
 
-		// envia estado atual do cliente para o servidor
 		dadosDoCliente = new DadosDoCliente(cliente, UPDATE_TIME);
 		Thread threadDados = new Thread(dadosDoCliente);
 		threadDados.start();
+		// envia estado atual do cliente para o servido
 
 		Jogador meuJogador = MainActivity.GetInstance().getPlayer();
 
@@ -137,13 +177,24 @@ public class ViewDeRede extends View implements Runnable, Killable,
 				+ meuJogador.getX() + "," + meuJogador.getPatente());
 
 		nick = meuJogador.getID();
+		img = new ImageManager(context);
 
+		ImgCorda = img.ImageManager("corda2.png");
+		barra = img.ImageManager("barrinha_vermelha.png");
 		if (nick == "Player 1") {
 			Play1 = true;
+			mao = img.ImageManager("tileset_maoPlayer2.png");
+			maoAdv = img.ImageManager("tileset_maotileset_maoPlayer1.png");
+
+			ImgMaoRosa = BitmapManager.GetInstance().getImageMaoRosa1();
 		} else {
 			Play1 = false;
+			mao = img.ImageManager("tileset_maotileset_maoPlayer1.png");
+			maoAdv = img.ImageManager("tileset_maoPlayer2.png");
+			ImgMaoRosa = BitmapManager.GetInstance().getImageMaoRosa2();
+
 		}
-		
+
 		setFocusableInTouchMode(true);
 		setClickable(true);
 		setLongClickable(true);
@@ -152,12 +203,28 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 		bitmapManager = new BitmapManager(context);
 		intensManager = new ItensManager();
-		img = new ImageManager(context);
 
-		
-		mao = img.ImageManager("tileset_maotileset_maoPlayer1.png");		
+		ImgCordaF = BitmapManager.GetInstance().getimgCordaFull();
 		sprite = new Sprite(mao, 4, 1);
-	
+		spriteMaoAdv = new Sprite(maoAdv, 4, 1);
+		ImgCasca1 = BitmapManager.GetInstance().getImageCascaSprite1();
+
+		ImgCasca2 = BitmapManager.GetInstance().getImageCascaSprite2();
+		ImgTNT1 = BitmapManager.GetInstance().getImageTNTSprite1();
+
+		ImgTNT2 = BitmapManager.GetInstance().getImageTNTSprite2();
+		Serverfundo = BitmapManager.GetInstance().getfundoServer();
+		Vitoria = BitmapManager.GetInstance().getImageVitoria();
+		Derrota = BitmapManager.GetInstance().getImageDerrota();
+
+		spriteCasca2 = new Sprite(ImgCasca2, 14, 7);
+		spriteCasca1 = new Sprite(ImgCasca1, 14, 7);
+		spriteTNT1 = new Sprite(ImgTNT1, 12, 4);
+		spriteTNT2 = new Sprite(ImgTNT2, 12, 4);
+
+		marcador = BitmapManager.GetInstance().getImageMarcador();
+		// casca1 tem que ir de trás para frente
+		// spriteCascaLanc.status=false;
 
 		Thread processo = new Thread(this);
 		processo.start();
@@ -178,28 +245,47 @@ public class ViewDeRede extends View implements Runnable, Killable,
 		int larguraBarra = (int) getWidth() / 15;
 		int alturaBarra = (int) getHeight() / 15;
 		createBarrinhas(larguraBarra, alturaBarra);
+		dadosDoCliente.setwidthFull(larguraView);
 
+		int altIdealCorda = ImgCorda.getHeight() * getWidth()
+				/ ImgCorda.getWidth();
+		Corda = new Rect(0, 13 * getHeight() / 30, getWidth(), 13 * getHeight()
+				/ 30 + altIdealCorda);
+
+		CordaFull = new Rect(0, 13 * getHeight() / 30, getWidth(), 13
+				* getHeight() / 30 + altIdealCorda);
 		bitmapManager.setRect(this);
-		intensManager.setDim(this, Play1);
 		Width = getWidth() / 2;
 		Height = getHeight() / 2;
-		positionY = Height;
-		positionX = Width;
+		positionY = 3 * Height / 8;
+		// positionX = Width;
+		CascaRect.set(0, 0, getWidth(), getHeight());
 
-		rectzinhoTeste = new Rect();
-		rectzinhoTeste.set((int) Width - getWidth() / 6, (int) Height
-				- getHeight() / 10, (int) Width + getWidth() / 6, (int) Height
-				+ getHeight() / 10);
+		int proporc = marcador.getWidth() * getHeight() / 20
+				/ marcador.getHeight();
+		if (Play1) {
+			dadosDoCliente.setPosMao(2 * getWidth() / 3);
 
+			rectMarcador = new Rect(7 * getWidth() / 10, 6 * getHeight() / 20,
+					7 * getWidth() / 10 + proporc, 7 * getHeight() / 20);
+		} else {
+			dadosDoCliente.setPosMao(2 * getWidth() / 3);
+
+			rectMarcador = new Rect(getWidth() / 10 - proporc,
+					6 * getHeight() / 20, getWidth() / 10, 7 * getHeight() / 20);
+		}
+
+		dadosDoCliente.setX(0);
 		// Carregando Bitmpas.
 		fundo = BitmapManager.GetInstance().getImageFundo();
-		impulso = BitmapManager.GetInstance().getImageImpulso();
-		massa = BitmapManager.GetInstance().getImageMassa();
-		velocidade = BitmapManager.GetInstance().getImageVelocidade();
-		itemEsp = BitmapManager.GetInstance().getImageEnergitco();
+		ImgCasca = BitmapManager.GetInstance().getImageCasca();
+		ImgTNT = BitmapManager.GetInstance().getImageTNT();
+		ImgEnergetico = BitmapManager.GetInstance().getImageEnergitco();
 		patente = BitmapManager.GetInstance().getImagePatente();
 		Z = BitmapManager.GetInstance().getImageZ();
 		divisor = BitmapManager.GetInstance().getImageDivisor();
+
+		intensManager.setDim(this, Play1, ImgEnergetico, ImgTNT, ImgCasca);
 
 		// Carregando rects.
 		rectFundo = BitmapManager.GetInstance().getRectFundo();
@@ -214,21 +300,22 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 	public void createBarrinhas(int larguraBarra, int alturaBarra) {
 
-		Barrinhas[0] = new Rect(larguraBarra, 2 * alturaBarra,
-				(int) (1.5f * larguraBarra), (int) (2.5f * alturaBarra));
+		Barrinhas[0] = new Rect(3 * larguraBarra, 2 * alturaBarra,
+				(int) (4.5f * larguraBarra), (int) (2.5f * alturaBarra));
 		Barrinhas[1] = new Rect(larguraBarra, 3 * alturaBarra,
 				(int) (1.5f * larguraBarra), (int) (3.5f * alturaBarra));
 		Barrinhas[2] = new Rect(larguraBarra, (4 * alturaBarra),
 				(int) (1.5f * larguraBarra), (int) (4.5f * alturaBarra));
-		dadosDoCliente.setImpX(Barrinhas[0].right);
+		dadosDoCliente.setImpX(0);
 		dadosDoCliente.setMasX(Barrinhas[2].right);
 		dadosDoCliente.setVelX(Barrinhas[1].right);
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {
 		fila.add(event);
-		processEventQueue();
-
+		if (autorizado) {
+			processEventQueue();
+		}
 		return super.onTouchEvent(event);
 	}
 
@@ -248,11 +335,8 @@ public class ViewDeRede extends View implements Runnable, Killable,
 				intensManager.detectar(q, r);
 				if (intensManager.Detectado()) {
 					PriTouch = intensManager.ItemAtual();
-					if (PriTouch != "ItemEsp") {
-						BotItem();
-					} else {
-						BotItemEsp();
-					}
+
+					BotItemEsp();
 
 				}
 
@@ -282,11 +366,8 @@ public class ViewDeRede extends View implements Runnable, Killable,
 					intensManager.detectar(segTouchX, segTouchY);
 					if (intensManager.Detectado()) {
 						SegTouch = intensManager.ItemAtual();
-						if (SegTouch != "ItemEsp") {
-							BotItem();
-						} else {
-							BotItemEsp();
-						}
+
+						BotItemEsp();
 
 					}
 
@@ -341,11 +422,9 @@ public class ViewDeRede extends View implements Runnable, Killable,
 						if (point.x == q && PriTouch != "corda") {
 							intensManager.detectar(p, t);
 							if (intensManager.Detectado()) {
-								if (intensManager.ItemAtual() != "ItemEsp") {
-									calcularItens();
-								} else {
-									calcularItemEsp();
-								}
+
+								calcularItemEsp();
+
 							} else {
 								impp = false;
 								PriTouch = SegTouch;
@@ -356,11 +435,9 @@ public class ViewDeRede extends View implements Runnable, Killable,
 						if (point.x == segTouchX && SegTouch != "corda") {
 							intensManager.detectar(p, t);
 							if (intensManager.Detectado()) {
-								if (intensManager.ItemAtual() != "ItemEsp") {
-									calcularItens();
-								} else {
-									calcularItemEsp();
-								}
+
+								calcularItemEsp();
+
 							} else {
 								impp = false;
 								SegTouch = "";
@@ -392,9 +469,11 @@ public class ViewDeRede extends View implements Runnable, Killable,
 						if ((int) point.x == q) {
 							if (possivel == true && PriTouch == "corda") {
 								if (Play1 && q < event.getX(id)) {
-									if (maoPlayer.contains((int) event.getX(id),
+									if (maoPlayer.contains(
+											(int) event.getX(id),
 											(int) event.getY(id))) {
-										positionX = event.getX(id) - 10;
+										dadosDoCliente
+												.setPosMao(event.getX(id) - 10);
 									} else {
 										aplicarForca((int) ((event.getX(id) - q) / 3 * Num_impulso));
 										possivel = false;
@@ -402,9 +481,11 @@ public class ViewDeRede extends View implements Runnable, Killable,
 									}
 								}
 								if (!Play1 && q > event.getX(id)) {
-									if (maoPlayer.contains((int) event.getX(id),
+									if (maoPlayer.contains(
+											(int) event.getX(id),
 											(int) event.getY(id))) {
-										positionX = event.getX(id) + 10;
+										dadosDoCliente
+												.setPosMao(event.getX(id) + 10);
 									} else {
 										aplicarForca((int) ((q - event.getX(id)) / 3 * Num_impulso));
 										possivel = false;
@@ -418,7 +499,8 @@ public class ViewDeRede extends View implements Runnable, Killable,
 							if (Play1 && segTouchX < event.getX(id)) {
 								if (maoPlayer.contains((int) event.getX(id),
 										maoPlayer.centerY())) {
-									positionX = event.getX(id) - 10;
+									dadosDoCliente
+											.setPosMao(event.getX(id) - 10);
 								} else {
 									aplicarForca((int) ((event.getX(id) - segTouchX) / 3));
 									possivel = false;
@@ -429,7 +511,8 @@ public class ViewDeRede extends View implements Runnable, Killable,
 							if (!Play1 && segTouchX > event.getX(id)) {
 								if (maoPlayer.contains((int) event.getX(id),
 										maoPlayer.centerY())) {
-									positionX = event.getX(id) + 10;
+									dadosDoCliente
+											.setPosMao(event.getX(id) + 10);
 								} else {
 									aplicarForca((int) ((segTouchX - event
 											.getX(id)) / 3));
@@ -505,17 +588,15 @@ public class ViewDeRede extends View implements Runnable, Killable,
 					if (point.x == q && PriTouch != "corda") {
 						intensManager.detectar(a, b);
 						if (intensManager.Detectado()) {
-							if (intensManager.ItemAtual() != "ItemEsp") {
-								calcularItens();
-							} else {
-								Log.i(TAG, "Entrou no up do item especial ");
-								CoolD.CoolDown = true;
-								CoolD.coolDownTime = 10;
-								Log.i(TAG, "Entrou1:" + CoolD.CoolDown);
 
-								calcularItemEsp();
-								Log.i(TAG, "Entrou2:" + CoolD.CoolDown);
-							}
+							Log.i(TAG, "Entrou no up do item especial ");
+							CoolD.CoolDown = true;
+							CoolD.coolDownTime = 10;
+							Log.i(TAG, "Entrou1:" + CoolD.CoolDown);
+
+							calcularItemEsp();
+							Log.i(TAG, "Entrou2:" + CoolD.CoolDown);
+
 						} else {
 							impp = false;
 							PriTouch = SegTouch;
@@ -527,11 +608,8 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 						intensManager.detectar(a, b);
 						if (intensManager.Detectado()) {
-							if (intensManager.ItemAtual() != "ItemEsp") {
-								calcularItens();
-							} else {
-								calcularItemEsp();
-							}
+
+							calcularItemEsp();
 
 						} else {
 							impp = false;
@@ -557,24 +635,35 @@ public class ViewDeRede extends View implements Runnable, Killable,
 	public void calcularItemEsp() {
 
 		impp = false;
-
+		intensManager.updateItensManager(SegTouch, PriTouch, Barrinhas,
+				dadosDoCliente, 3, status, Energetico, Casca, TNT);
+		Toast.makeText(getContext(), "FOOI", Toast.LENGTH_LONG);
 		// Log.i("partida", "" + n);
-		dadosDoCliente.setItemEsp(coolD.item_Selecionado);
+		if (status > 3) {
+			if (CoolD.item_Selecionado == 0) {
+				Num_impulso = 10000;
+				CoolD.CoolDown = true;
+				CoolD.coolDownTime = 2;
+				dadosDoCliente.setItemEsp(CoolD.item_Selecionado);
 
-		if (CoolD.item_Selecionado == 0) {
-			Num_impulso = 10000;
-			CoolD.CoolDown = true;
-			CoolD.coolDownTime = 2;
+			}
 		}
-		if (CoolD.item_Selecionado == 1) {
-			Num_impulso = 20000;
-			CoolD.CoolDown = true;
-			CoolD.coolDownTime = 2;
+		if (status > 7) {
+			if (CoolD.item_Selecionado == 1) {
+				Num_impulso = 20000;
+				CoolD.CoolDown = true;
+				CoolD.coolDownTime = 2;
+				dadosDoCliente.setItemEsp(CoolD.item_Selecionado);
+
+			}
 		}
-		if (CoolD.item_Selecionado == 2) {
-			Num_impulso = 30000;
-			CoolD.CoolDown = true;
-			CoolD.coolDownTime = 2;
+		if (status > 10) {
+			if (CoolD.item_Selecionado == 2) {
+				Num_impulso = 30000;
+				CoolD.CoolDown = true;
+				CoolD.coolDownTime = 3;
+				dadosDoCliente.setItemEsp(CoolD.item_Selecionado);
+			}
 		}
 
 		// if (PriTouch == "Velocidade") {
@@ -593,48 +682,30 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 	public void aplicarForca(int i) {
 
-		positionX = Width;
 		if (Play1) {
-			dadosDoCliente.setX(posicaoCorda + 1);
+			dadosDoCliente.setPosMao(2 * getWidth() / 3);
 		} else {
-			dadosDoCliente.setX(posicaoCorda - 1);
-		}
-		if (Num_impulso == 30000) {
-			if (Barrinhas[0].right - Barrinhas[0].left >= 3) {
-				Forca = (int) (Forca * 1.3f);
-				dadosDoCliente.setImpX(Barrinhas[0].right - 3);
-			} else {
-
-				Forca = (int) (Forca * 1.1f);
-				dadosDoCliente.setImpX(Barrinhas[0].left);
-			}
+			dadosDoCliente.setPosMao(getWidth() / 3);
 
 		}
-		if (Num_impulso == 20000) {
-			if (Barrinhas[2].right - Barrinhas[2].left >= 3) {
-				Forca = (int) (Forca * 1.4f);
-				dadosDoCliente.setMasX(Barrinhas[2].right - 3);
+		if (Play1) {
+			if (itemEspecial == 0) {
+				dadosDoCliente.setX(posicaoCorda + 3);
 			} else {
-
-				Forca = (int) (Forca * 1.2f);
-				dadosDoCliente.setMasX(Barrinhas[2].left);
-				// dadosDoCliente.setX(atual.left + 20);
-				paint.setColor(Color.BLUE);
-
+				dadosDoCliente.setX(posicaoCorda + 1);
 			}
-
+		} else {
+			if (itemEspecial == 0) {
+				dadosDoCliente.setX(posicaoCorda - 3);
+			} else {
+				dadosDoCliente.setX(posicaoCorda - 1);
+			}
 		}
-		if (Num_impulso == 10000) {
-			if (Barrinhas[1].right - Barrinhas[1].left >= 3) {
-				Forca = (int) (Forca * 1.8f);
-				dadosDoCliente.setVelX(Barrinhas[1].right - 3);
+		status++;
+		if (status < 12) {
 
-			} else {
-
-				Forca = (int) (Forca * 1.3f);
-				dadosDoCliente.setVelX(Barrinhas[1].left);
-
-			}
+			Forca = (int) (Forca * 1.3f);
+			dadosDoCliente.setImpX(status);
 
 		}
 		Forca = i;
@@ -643,18 +714,6 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 	public void calcularItens() {
 		impp = false;
-		dadosDoCliente.setX(-70);
-
-		int larguraBarra = (int) getWidth() / 15;
-		int alturaBarra = (int) getHeight() / 15;
-
-		Barrinhas[0].set(larguraBarra, 2 * alturaBarra,
-				(int) (1.5f * larguraBarra), (int) (2.5f * alturaBarra));
-		if (current - counter <= 100) {
-			Num_impulso = 30000;
-			current = 0;
-
-		}
 		if (PriTouch == intensManager.StatusRect) {
 			PriTouch = SegTouch;
 			SegTouch = "";
@@ -665,48 +724,102 @@ public class ViewDeRede extends View implements Runnable, Killable,
 
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
+
 		ConcurrentHashMap<String, Jogador> jogadores = tratadorDeDadosDoCliente
 				.getJogadores();
 
 		Iterator<String> iterator = jogadores.keySet().iterator();
 
-		// rectFundo.set(0, 0, getWidth(),getHeight());
+		rectFundo.set(0, 0, getWidth(), getHeight());
 
 		while (iterator.hasNext()) {
 			String keey = iterator.next();
 			Jogador jogadorLindu = jogadores.get(keey);
-			if (jogadorLindu.getVitoria()) {
-				paint.setColor(Color.MAGENTA);
-				canvas.drawRect(0, 0, getWidth(), getHeight(), paint);// como se
-																		// fosse
-																		// a
-																		// tela
-																		// de
-																		// vitória(fim
-																		// de
-																		// jogo)
+			if (jogadores.get(nick) != null) {
+				if (!jogadores.get(nick).isVisible()
+						&& !jogadores.get(nick).getVitoria()
+						&& !jogadores.get(nick).Perdeu()) {
+					canvas.drawBitmap(Serverfundo, null, rectFundo, paint);
+
+					paint.setColor(Color.BLACK);
+					paint.setTextSize(25);
+					canvas.drawText(RedeUtil.getLocalIpAddress(),
+							getWidth() / 10, 12 * getHeight() / 30, paint);
+				}
 			}
-			if (!jogadorLindu.isVisible()) {
+			if (jogadores.get(nick).getVitoria()) {
+				paint.setColor(Color.MAGENTA);
+				canvas.drawBitmap(Vitoria, null, rectFundo, paint);
+
+				// como se
+				// fosse
+				// a
+				// tela
+				// de
+				// vitória(fim
+				// de
+				// jogo)
+			} else {
+				if (jogadores.get(nick).Perdeu()) {
+
+					canvas.drawBitmap(Derrota, null, rectFundo, paint);
+
+				}else{
+				if (jogadorLindu.getFechar()) {
+
+					killMeSoftly();
+				}
+				}
+			}
+
+			if (jogadorLindu.isVisible()) {
 
 				if (jogadorLindu.getX() != posicaoCorda
 						&& jogadorLindu.getX() != -70) {
 					posicaoCorda = jogadorLindu.getX();
-					rectzinhoTeste.left = (20 + posicaoCorda) * getWidth() / 40
-							- getWidth() / 6;
-					rectzinhoTeste.right = (int) (rectzinhoTeste.left + 2 * getWidth() / 6);
+					Corda.left = posicaoCorda * getWidth() / 40;
+					Corda.right = (int) (Corda.left + getWidth());
 					dadosDoCliente.setX(-70);
 				}
 
+				Jogador jogador = jogadores.get(nick);
+
+				positionX = jogador.getPosMao();
 				// PLAYER1
+				int Prop = mao.getHeight() * 7 * getWidth() / 20
+						/ (mao.getWidth() / 4);
+
 				if (Play1) {
-					maoPlayer.set((int) positionX, (int) positionY,
-							(int) positionX + 200, (int) positionY + 100);
+					// maoPlayer.set((int) positionX, (int) positionY,
+					// (int) positionX + 200, (int) positionY + 100);
+
+					maoPlayer.set((int) positionX, (int) Corda.centerY() - 8
+							* Prop / 10, (int) positionX + 7 * getWidth() / 20,
+							(int) (Corda.centerY() + Prop));
+					if (jogadores.get("Player 2") != null) {
+
+						int newProp = (int) (jogadores.get("Player 2")
+								.getPosMao() * getWidth() / jogadores.get(
+								"Player 2").getWidthfull());
+						maoPlayerAdv.set((int) newProp - 7 * getWidth() / 20,
+								(int) Corda.centerY() - 8 * Prop / 10,
+								(int) newProp, (int) (Corda.centerY() + Prop));
+					}
 					if (posicaoCorda >= 20) {
 						dadosDoCliente.finalizar();
 					}
 				} else {
-					maoPlayer.set((int) positionX - 200, (int) positionY,
-							(int) positionX, (int) positionY + 100);
+					maoPlayer.set((int) positionX - 7 * getWidth() / 20,
+							(int) Corda.centerY() - 8 * Prop / 10,
+							(int) positionX, (int) (Corda.centerY() + Prop));
+					if (jogadores.get("Player 1") != null) {
+						int newProp = (int) (jogadores.get("Player 1")
+								.getPosMao() * getWidth() / jogadores.get(
+								"Player 1").getWidthfull());
+						maoPlayerAdv.set((int) newProp, (int) Corda.centerY()
+								- 8 * Prop / 10, newProp + 7 * getWidth() / 20,
+								(int) (Corda.centerY() + Prop));
+					}
 					if (posicaoCorda <= -20) {
 						dadosDoCliente.finalizar();
 					}
@@ -714,46 +827,130 @@ public class ViewDeRede extends View implements Runnable, Killable,
 				}
 
 				canvas.drawBitmap(fundo, null, rectFundo, paint);
-				canvas.drawBitmap(impulso, null,
+				canvas.drawBitmap(ImgCasca, null,
 						intensManager.rectsItens.get(0), paint);
-				canvas.drawBitmap(massa, null, intensManager.rectsItens.get(1),
-						paint);
-				canvas.drawBitmap(velocidade, null,
+				canvas.drawBitmap(ImgTNT, null,
 						intensManager.rectsItens.get(2), paint);
-				canvas.drawBitmap(itemEsp, null,
+				canvas.drawBitmap(ImgEnergetico, null,
 						intensManager.rectsItens.get(3), paint);
 
 				canvas.drawBitmap(patente, null, rectPatente, paint);
 				canvas.drawBitmap(Z, null, rectZ, paint);
 				canvas.drawBitmap(divisor, null, rectDivisor, paint);
 
-				sprite.Draw(canvas,maoPlayer);
+				canvas.drawBitmap(ImgCordaF, null, CordaFull, paint);
+				canvas.drawBitmap(ImgCorda, null, Corda, paint);
+				canvas.drawBitmap(marcador, null, rectMarcador, paint);
+				if (itemEspecial == 0) {
+
+					canvas.drawBitmap(ImgMaoRosa, null, maoPlayer, paint);
+				} else {
+					sprite.Draw(canvas, maoPlayer);
+				}
+				spriteMaoAdv.Draw(canvas, maoPlayerAdv);
+				if (spriteCasca2.status) {
+					spriteCasca2.Draw(canvas, CascaRect);
+				}
+				if (spriteCasca1.status) {
+					spriteCasca1.Draw(canvas, CascaRect);
+				}
+
+				if (spriteTNT2.status) {
+					spriteTNT2.Draw(canvas, CascaRect);
+				}
+				if (spriteTNT1.status) {
+					spriteTNT1.Draw(canvas, CascaRect);
+				}
 
 				Iterator<String> iterato = jogadores.keySet().iterator();
 
-				Jogador jogador = jogadores.get(nick);
-
-				Barrinhas[0].right = jogador.getImpX();
-				Barrinhas[2].right = jogador.getMasX();
-				Barrinhas[1].right = jogador.getVelX();
-
-				canvas.drawRect(rectzinhoTeste, paint);// desenha o rect de este
-														// de viória
+				Barrinhas[0].right = Barrinhas[0].left + jogador.getImpX()
+						* getWidth() / 36;
+				// Barrinhas[2].right = jogador.getMasX();
+				// Barrinhas[1].right = jogador.getVelX();
 
 				for (int i = 0; i < Barrinhas.length; i++) {
-					canvas.drawRect(Barrinhas[i], paint);
+					// canvas.drawRect(Barrinhas[i], paint);
 
 				}
+				status = jogador.getImpX();
+				canvas.drawBitmap(barra, null, Barrinhas[0], paint);
 
 				if (itemEspecial < 0 && jogador.getItemEspecial() != -1) {
 
 					itemEspecial = jogador.getItemEspecial();
+					if (itemEspecial == 0) {
+
+						ImgEnergetico = BitmapManager.GetInstance()
+								.getImageEnergUso();
+						Energetico = false;
+					}
+					if (itemEspecial == 1) {
+
+						ImgCasca = BitmapManager.GetInstance()
+								.getImageCascaUso();
+						Casca = false;
+						if (Play1) {
+							// chamar o sprite o Spritecasca2
+							spriteCasca2.status = true;
+
+						} else {
+							// chamar o spritecasca1 de tras para frente
+							spriteCasca1.Modificar(13);
+
+							spriteCasca1.status = true;
+						}
+					}
+					if (itemEspecial == 2) {
+
+						ImgTNT = BitmapManager.GetInstance().getImageTNTUso();
+						Casca = false;
+
+						if (Play1) {
+							// chamar o sprite o Spritecasca2
+							spriteTNT1.Modificar(11);
+
+							spriteTNT1.status = true;
+						} else {
+							// chamar o spritecasca1 de tras para frente
+
+							spriteTNT2.status = true;
+						}
+					}
 					// Aqui vem o trecho em que trata o item especial , as
 					// modificacoes que ocorrerao no jogador
 				}
 				if (acionar <= 0 && jogador.getItemAcionado() != -1) {
 
 					acionar = jogador.getItemAcionado();
+					autorizado = false;
+					if (acionar == 1) {
+						if (Play1) {
+							// chamar o spritecasca1 de tras para frente
+							spriteCasca1.Modificar(13);
+							spriteCasca1.status = true;
+						} else {
+							spriteCasca2.status = true;
+						}
+					}
+
+					if (acionar == 2) {
+						if (Play1) {
+							// chamar o spritecasca1 de tras para frente
+
+							spriteTNT2.status = true;
+						} else {
+							spriteTNT1.Modificar(11);
+							spriteTNT1.status = true;
+						}
+					}
+
+					// if(acionar==1){
+					// spriteCascaLanc.status=true;
+					// }
+					// else{
+					// spriteCascaLanc.status=false;
+					// }
 
 				}
 				if (itemEspecial >= 0 && jogador.getItemEspecial() < 0) {
@@ -763,28 +960,13 @@ public class ViewDeRede extends View implements Runnable, Killable,
 				if (acionar >= 0 && jogador.getItemAcionado() < 0) {
 
 					acionar = jogador.getItemAcionado();
+					autorizado = true;
 				}
-				
+
 				paint.setTextSize(20);
 
-				if (itemEspecial != -1 || acionar != -1) {
-					canvas.drawText("Item Esp" + itemEspecial + "Item Acio"
-							+ acionar, 50, 70, paint);
-				}
-				paint.setTextSize(20);
-
-				canvas.drawText("forcaa" + Forca + "impulsooo" + Num_impulso,
-						50, 30, paint);
-				paint.setTextSize(10);
-
-				canvas.drawText("Impulso", Barrinhas[0].left + 55,
-						Barrinhas[0].bottom, paint);
-				canvas.drawText("Velocidade", Barrinhas[2].left + 55,
-						Barrinhas[2].bottom, paint);
-
-				canvas.drawText("Massa", Barrinhas[1].left + 55,
-						Barrinhas[1].bottom, paint);
 			}
+
 		}
 
 	}
@@ -804,11 +986,26 @@ public class ViewDeRede extends View implements Runnable, Killable,
 	}
 
 	private void update() {
-				
+
 		this.deltaTime = System.currentTimeMillis() - this.lastTimeCount;
-		this.lastTimeCount = System.currentTimeMillis();		
-				
+		this.lastTimeCount = System.currentTimeMillis();
+
 		this.sprite.Update(this.deltaTime);
+		this.spriteMaoAdv.Update(this.deltaTime);
+
+		if (spriteCasca2.status) {
+			spriteCasca2.Voltar(this.deltaTime);
+
+		}
+		if (spriteCasca1.status) {
+			spriteCasca1.iniciar(this.deltaTime);
+		}
+		if (spriteTNT2.status) {
+			spriteTNT2.Voltar(this.deltaTime);
+		}
+		if (spriteTNT1.status) {
+			spriteTNT1.iniciar(this.deltaTime);
+		}
 
 		if (period != 0) {
 			counter++;
@@ -821,17 +1018,59 @@ public class ViewDeRede extends View implements Runnable, Killable,
 			current += 1000;
 			if (current - counter >= 100) {
 
-				intensManager.updateItensManager(SegTouch, PriTouch, Barrinhas,
-						dadosDoCliente, 3);
-
 			}
 
+		}
+		if (status > 3) {
+			if (itemEspecial != 0) {
+				ImgEnergetico = BitmapManager.GetInstance().getImageEnergitco();
+				Energetico = true;
+			} else {
+			}
+		} else {
+			ImgEnergetico = BitmapManager.GetInstance().getImageEnergitcoPB();
+			Energetico = false;
+		}
+		if (status > 7) {
+			if (itemEspecial != 1) {
+
+				ImgCasca = BitmapManager.GetInstance().getImageCasca();
+				Casca = true;
+			} else {
+
+			}
+		} else {
+			ImgCasca = BitmapManager.GetInstance().getImageCascaPB();
+			Casca = false;
+		}
+		if (status > 10) {
+
+			if (itemEspecial != 2) {
+				ImgTNT = BitmapManager.GetInstance().getImageTNT();
+				TNT = true;
+			} else {
+			}
+
+		} else {
+			ImgTNT = BitmapManager.GetInstance().getImageTNTPB();
+			TNT = false;
 		}
 
 	}
 
 	public void killMeSoftly() {
-		ativo = false;
+		 ativo = false;
+		this.cliente.killMeSoftly();
+
+		dadosDoCliente.killMeSoftly();
+		espera.finish();
 	}
 
+	public void OnBackPressed() {
+
+		Jogador jogador = jogadores.get(nick);
+
+		killMeSoftly();
+		//espera.finish();
+	}
 }

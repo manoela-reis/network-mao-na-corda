@@ -19,6 +19,7 @@ public class GerenteDEConexao implements Runnable, Killable {
 	public GerenteDEConexao(int porta) {
 		this.porta = porta;
 		conexoes = new ArrayList<Conexao>();
+		ativo=true;
 		ElMatador.getInstance().add(this);
 	}
 
@@ -107,6 +108,7 @@ public class GerenteDEConexao implements Runnable, Killable {
 			conexao.killMeSoftly();
 		}
 
+		ElMatador.getInstance().killThenAll();
 		ativo = false;
 		try {
 			Thread.sleep(200);

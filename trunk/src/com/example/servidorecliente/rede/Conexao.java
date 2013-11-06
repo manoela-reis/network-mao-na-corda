@@ -1,6 +1,5 @@
 package com.example.servidorecliente.rede;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -20,20 +19,22 @@ public class Conexao implements Runnable, Killable {
 	private BufferedReader leitor;
 	private BufferedWriter escritor;
 	private String id;
-private Jogador joga;
+	private Jogador joga;
 	private int x;
 	private Socket conexao;
 	private boolean ativo = true;
 	private Thread escutandoParaSempre;
 	private DepoisDeReceberDados depoisDeReceberDadosHandler;
 
-	public Jogador getJogador(){
-		
+	public Jogador getJogador() {
+
 		return joga;
 	}
-	public void Joog(Jogador jogaaa){
-		this.joga=jogaaa;
+
+	public void Joog(Jogador jogaaa) {
+		this.joga = jogaaa;
 	}
+
 	public String getId() {
 		return id;
 	}
@@ -41,15 +42,15 @@ private Jogador joga;
 	public void setId(String id) {
 		this.id = id;
 	}
-	
 
-	public void setX(int x){
-		this.x=x;
+	public void setX(int x) {
+		this.x = x;
 	}
-	public int GetX(){
+
+	public int GetX() {
 		return x;
 	}
-	
+
 	/**
 	 * usado para criar objetos de conexao do lado servidor
 	 * 
@@ -63,6 +64,7 @@ private Jogador joga;
 			throws IOException {
 
 		this.conexao = conexao;
+		ativo=true;
 		this.depoisDeReceberDadosHandler = depoisDeReceberDadosHandler;
 		this.id = id;
 		ElMatador.getInstance().add(this);
@@ -97,7 +99,7 @@ private Jogador joga;
 				// para cada linha nao nula chama o respectivo handler
 				if (linha != null) {
 					Log.i(TAG, "linha recebida: " + linha);
-					
+
 					if (depoisDeReceberDadosHandler != null) {
 						depoisDeReceberDadosHandler.execute(this, linha);
 					}
@@ -112,13 +114,14 @@ private Jogador joga;
 	public void killMeSoftly() {
 		if (conexao != null) {
 			try {
+				write(Protocolo.PROTOCOL_SAIU + ":" + id);
+				ativo=false;
 				conexao.close();
 			} catch (IOException e) {
 				Log.e(TAG, "erro ao fechar conexao", e);
 			}
 		}
 
-		ativo = false;
 		try {
 			Thread.sleep(Const.ESPERA_CONEXAO_MORRER);
 			escutandoParaSempre.interrupt();
