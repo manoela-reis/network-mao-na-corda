@@ -1,12 +1,13 @@
 package com.example.servidorecliente;
 
-import com.TelasDeSelecao.Creditos;
-import com.TelasDeSelecao.Instrucoes;
-
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+
+import com.TelasDeSelecao.Creditos;
+import com.TelasDeSelecao.Instrucoes;
+import com.example.servidorecliente.R;
 
 public class ActivityMenu extends Activity {
 

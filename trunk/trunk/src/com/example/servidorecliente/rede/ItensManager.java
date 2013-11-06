@@ -2,44 +2,51 @@ package com.example.servidorecliente.rede;
 
 import java.util.ArrayList;
 
+import com.example.servidorecliente.CoolD;
+
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 
 public class ItensManager {
 
-	private Rect Impulso = new Rect();
+	private Rect Casca = new Rect();
 	private Rect Massa = new Rect();
-	private Rect Velocidade = new Rect();
+	private Rect Dinamite = new Rect();
 
 	public ArrayList<Rect> rectsItens = new ArrayList<Rect>();
 	public String StatusRect;
 	Boolean detectado = false;
 
 	// vitoria
-	private Rect ItemEsp = new Rect();
+	private Rect Energetico = new Rect();
 	int altura;
 	int largura;
 
 	public ItensManager() {
 
-		rectsItens.add(Impulso);
+		rectsItens.add(Casca);
 		rectsItens.add(Massa);
-		rectsItens.add(Velocidade);
-		rectsItens.add(ItemEsp);
+		rectsItens.add(Dinamite);
+		rectsItens.add(Energetico);
 
 	}
 
-	public void setDim(ViewDeRede view, Boolean player1) {
+	public void setDim(ViewDeRede view, Boolean player1, Bitmap Energ,Bitmap TNT, Bitmap cascaBan) {
 		largura = view.larguraView;
 		altura = view.alturaView;
-		if (player1) {
-			Impulso.set(largura / 6, (int) (altura / 1.4f),
-					(int) (largura / 3.5f), (int) (altura / 1.04f));
-			Massa.set((int) (largura / 3.30), (int) (altura / 1.4f),
-					(int) (largura / 2.4f), (int) (altura / 1.04f));
-			Velocidade.set((int) (largura / 2.28), (int) (altura / 1.4f),
-					(int) (largura / 1.8f), (int) (altura / 1.04f));
-			ItemEsp.set((int) (largura / 1.75), (int) (altura / 1.4f),
-					(int) (largura / 1.45f), (int) (altura / 1.04f));
+		//int energ = Energ.getWidth()*(8*altura/30)/Energ.getHeight();
+				int tnt=TNT.getWidth()*(8*altura/30)/TNT.getHeight();
+				int energ=tnt;
+				int casca = cascaBan.getWidth()*(8*altura/30)/cascaBan.getHeight();
+				if(player1) {
+			Energetico.set(largura / 20, (int) (21*altura / 30),
+					(int) (largura /20+energ), (int) (29*altura / 30));
+			Casca.set((int) (largura /20+energ+largura/30), (int) (21*altura / 30),
+					(int) ((largura /20+energ+largura/30)+tnt), (int) (29*altura / 30));
+			Dinamite.set((int) (((largura /20+energ+largura/30)+tnt)+largura/30), (int) (21*altura / 30),
+					(int) ((((largura /20+energ+largura/30)+tnt)+largura/30)+casca), (int) (29*altura / 30));
+		//	Energetico.set((int) (largura / 1.75), (int) (altura / 1.4f),
+			//		(int) (largura / 1.45f), (int) (altura / 1.04f));
 
 			/*
 			 * Velocidade.set((int) (2.3f * larguraItem), 6 * alturaItem, (int)
@@ -50,10 +57,15 @@ public class ItensManager {
 			 * (3 * alturaItem));
 			 */
 		} else {
-			Impulso.set((int) (largura / 1.3f), (int) (altura / 1.4f),
-					(int) (largura / 1.1f), (int) (altura / 1.04f));
-			Massa.set((int) (largura / 1.6f), (int) (altura / 1.4f),
-					(int) (largura / 1.4f), (int) (altura / 1.04f));
+			
+
+
+			Energetico.set((((19*largura /20-tnt)-largura/30))-casca-largura/30-energ, (int) (21*altura / 30),
+					(int) (((19*largura /20-tnt)-largura/30))-casca-largura/30, (int) (29*altura / 30));
+			Casca.set((int) ((19*largura /20-tnt)-largura/30)-casca, (int) (21*altura / 30),
+					(int) (19*largura /20-tnt)-largura/30, (int) (29*altura / 30));
+			Dinamite.set((int) (19*largura /20-tnt), (int) (21*altura / 30),
+					(int) (19*largura /20), (int) (29*altura / 30));
 
 			/*
 			 * Impulso.set((int)(5.5*larguraItem), 6 * alturaItem, (int) (6.5f *
@@ -101,25 +113,25 @@ public class ItensManager {
 		if (rectsItens.get(0).contains(xPonto, yPonto)) {
 			// BotImpulso();
 			detectado = true;
-			StatusRect = "Impulso";
+			StatusRect = "Casca";
 
 		}
 		if (rectsItens.get(2).contains(xPonto, yPonto)) {
 			// BotVelocidade();
 			detectado = true;
-			StatusRect = "Velocidade";
+			StatusRect = "Dinamite";
 
 		}
-		if (rectsItens.get(1).contains(xPonto, yPonto)) {
-			// BotMassa();
-			detectado = true;
-			StatusRect = "Massa";
-
-		}
+		// if (rectsItens.get(1).contains(xPonto, yPonto)) {
+		// // BotMassa();
+		// detectado = true;
+		// StatusRect = "Impulso";
+		//
+		// }
 		if (rectsItens.get(3).contains(xPonto, yPonto)) {
 			// //BotIten();
 			detectado = true;
-			StatusRect = "ItemEsp";
+			StatusRect = "Energetico";
 
 			// CoolD.CoolDown = true;
 
@@ -136,33 +148,28 @@ public class ItensManager {
 	}
 
 	public void updateItensManager(String SegTouch, String PriTouch,
-			Rect[] Barrinhas, DadosDoCliente dadosDoCliente, int numberSet) {
+			Rect[] Barrinhas, DadosDoCliente dadosDoCliente, int numberSet,
+			int x, Boolean Energ, Boolean Casca, Boolean Dinamite) {
 
-		if (SegTouch == "Impulso" || PriTouch == "Impulso") {
-			if (Barrinhas[0].right - Barrinhas[0].left < 50) {
-				if (Barrinhas[0].right + 3 - Barrinhas[0].left > 50) {
+		if (Energ) {
+			if (SegTouch == "Energetico" || PriTouch == "Energetico") {
+				dadosDoCliente.setImpX((x - 3));
+				CoolD.item_Selecionado = 0;
 
-				} else {
-					dadosDoCliente.setImpX(Barrinhas[0].right + numberSet);
-				}
 			}
 		}
-		if (SegTouch == "Velocidade" || PriTouch == "Velocidade") {
-			if (Barrinhas[1].right - Barrinhas[1].left < 50) {
-				if (Barrinhas[1].right + 3 - Barrinhas[1].left > 50) {
+		if (Casca) {
+			if (SegTouch == "Casca" || PriTouch == "Casca") {
+				dadosDoCliente.setImpX((x - 7));
+				CoolD.item_Selecionado = 1;
 
-				} else {
-					dadosDoCliente.setVelX(Barrinhas[1].right + numberSet);
-				}
 			}
 		}
-		if (SegTouch == "Massa" || PriTouch == "Massa") {
-			if (Barrinhas[2].right - Barrinhas[2].left < 50) {
-				if (Barrinhas[2].right + 3 - Barrinhas[2].left > 50) {
+		if (Dinamite) {
+			if (SegTouch == "Dinamite" || PriTouch == "Dinamite") {
+				dadosDoCliente.setImpX((x - 10));
+				CoolD.item_Selecionado = 2;
 
-				} else {
-					dadosDoCliente.setMasX(Barrinhas[2].right + numberSet);
-				}
 			}
 		}
 	}

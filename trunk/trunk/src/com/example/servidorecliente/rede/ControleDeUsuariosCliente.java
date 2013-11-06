@@ -39,6 +39,14 @@ public class ControleDeUsuariosCliente implements DepoisDeReceberDados {
 			String[] lista = linha.split(":");
 			FinalizarPartida(lista[1]);
 		}
+		if (linha.startsWith(Protocolo.PROTOCOL_PERDEU)) {
+			String[] lista = linha.split(":");
+			PerdeuPartida(lista[1]);
+		}
+		if (linha.startsWith(Protocolo.PROTOCOL_SAIU)) {
+			String[] lista = linha.split(":");
+			Saiu(origem,lista[1]);
+		}
 
 		if (linha.startsWith(Protocolo.PROTOCOL_ITENS)) {
 
@@ -67,17 +75,30 @@ public class ControleDeUsuariosCliente implements DepoisDeReceberDados {
 			int x = Integer.parseInt(separado[1]);
 			Boolean vitoria = Boolean.parseBoolean(separado[2]);
 			int itemEsp = Integer.parseInt(separado[3]);
+			float PosMao =  Float.parseFloat(separado[4]);
+			int impx = Integer.parseInt(separado[5]);
 
+float width = Float.parseFloat(separado[6]);
 			Jogador jogador = jogadores.get(nome);
 			if (jogador == null) {
 				jogador = new Jogador(nome, x, "Aspirante");
 				jogador.setItemEspecial(itemEsp);
+				jogador.setPosMAo(PosMao);
+				jogador.setImpX(impx);
 				jogador.setVitoria(vitoria);
+				jogador.setWidthfull(width);
+
 				jogadores.put(nome, jogador);
 			} else {
 				jogador.setX(x);
 				jogador.setItemEspecial(itemEsp);
+				jogador.setPosMAo(PosMao);
+				jogador.setImpX(impx);
+				jogador.setWidthfull(width);
+
+
 				jogador.setVitoria(vitoria);
+				
 
 			}
 			if (!jogador.isVisible() && jogador.getVitoria()) {
@@ -165,6 +186,31 @@ public class ControleDeUsuariosCliente implements DepoisDeReceberDados {
 			// jogador.update();
 			jogador.ganhou();
 			jogador.finalizarPartida();
+
+		}
+
+	}
+	public void PerdeuPartida(String linha) {
+		Iterator iterator = jogadores.keySet().iterator();
+		while (iterator.hasNext()) {
+			String key = (String) iterator.next();
+			Jogador jogador = jogadores.get(key);
+			// jogador.update();
+			jogador.setperdeu();
+			jogador.finalizarPartida();
+		}
+
+	}
+	public void Saiu(Conexao origem,String linha) {
+		Iterator iterator = jogadores.keySet().iterator();
+		while (iterator.hasNext()) {
+
+			String key = (String) iterator.next();
+			Jogador jogador = jogadores.get(key);
+			// jogador.update();
+			jogador.fechar();
+			jogador.finalizarPartida();
+			//origem.killMeSoftly();
 
 		}
 
